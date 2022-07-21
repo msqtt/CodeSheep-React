@@ -3,7 +3,6 @@ import * as React from 'react'
 import { Component } from 'react';
 
 import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
 
 
 class NotFound extends Component {
