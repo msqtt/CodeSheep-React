@@ -27,7 +27,7 @@ export default function SelectAutoWidth() {
           sx={{height: '2.5rem'}}
         > 
           <MenuItem value={'cpp'}>
-            <em>cpp</em>
+            <em>c/cpp</em>
           </MenuItem>
           <MenuItem value={'java'}>java</MenuItem>
           <MenuItem value={'python'}>python</MenuItem>

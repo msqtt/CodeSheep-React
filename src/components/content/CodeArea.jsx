@@ -13,6 +13,8 @@ import {java} from '@codemirror/lang-java';
 import {python} from '@codemirror/lang-python';
 import {javascript} from '@codemirror/lang-javascript';
 
+import {post} from '../../request';
+
 
 import { connect } from 'react-redux';
 import Select from './select';
@@ -52,8 +54,13 @@ class CodeArea extends Component {
         codeContent: '',
     }
 
-    handleFabClick = () => {
-        this.props.runcode(this.state.codeContent, this.state.inputContent);
+    handleFabClick = async () => {
+        let data = await post('/api/code', {
+            lang: this.props.lang,
+            code: this.state.codeContent,
+            input: this.state.inputContent
+        }, null)
+        this.props.runcode(this.state.codeContent, data.res, data.sta, data.msg);
     }
     
     render() { 
@@ -81,7 +88,7 @@ class CodeArea extends Component {
                             onChange={e=>{this.setState({codeContent: e})}}
                         />
                     </Card>
-                    <Fab onClick={this.handleFabClick} sx={{position: 'fixed', bottom: '1rem', right: `3rem`}} color="secondary">
+                    <Fab onClick={this.handleFabClick} sx={{position: 'fixed', bottom: '3rem', right: `3rem`}} color="secondary">
                         Go
                     </Fab>
 
@@ -128,15 +135,19 @@ const mapStateToProps = (state) => {
     return {
         lang: state.Language,
         output: state.CodeOutput,
+        msg: state.RunMsg,
+        runStatus: state.RunStatus,
     }
 }
 
 const mapDispatchToProps = {
-    runcode: (code, input)=>{
+    runcode: (code, res, sta, msg)=>{
         return {
             type: ACTIONS.RUNCODE,
             code,
-            input,
+            res,
+            sta,
+            msg
         }
     }
 }
