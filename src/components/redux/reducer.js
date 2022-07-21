@@ -5,7 +5,10 @@ const runCode = async (code, input) => {
     console.log(code, input);
     let resp;
     try {
-        resp = await axios.post('/code', {code, input});
+        resp = await axios.post('/api/code', {
+            code,
+            input
+        });
     } catch (error) {
         console.error(error);
     }

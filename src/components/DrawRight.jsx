@@ -22,7 +22,6 @@ import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import SaveIcon from '@mui/icons-material/Save';
 import LoginIcon from '@mui/icons-material/Login';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import LogoutIcon from '@mui/icons-material/Logout';
 import {useNavigate} from 'react-router-dom';
 
 
