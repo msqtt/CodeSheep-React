@@ -96,7 +96,6 @@ export default function PersistentDrawerRight(props) {
       <AppBar position="fixed" open={open}>
         <Toolbar>
             <CodeIcon />
-
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
             &nbsp;Coding Sheep
           </Typography>

@@ -2,25 +2,25 @@ import * as React from 'react'
 
 import { Component } from 'react';
 
-import Card from '@mui/material/Card';
-import Fab from '@mui/material/Fab';
-import Typography from '@mui/material/Typography';
+import { Fab, Card, Button, Typography, CircularProgress, Alert, Snackbar } from '@mui/material/';
+
+
+import SaveIcon from '@mui/icons-material/Save';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 import CodeMirror from '@uiw/react-codemirror';
 import {githubLight} from '@uiw/codemirror-theme-github';
 import {cpp} from '@codemirror/lang-cpp';
-import {java} from '@codemirror/lang-java';
 import {python} from '@codemirror/lang-python';
 import {javascript} from '@codemirror/lang-javascript';
 
-import {post} from '../../request';
-
-
 import { connect } from 'react-redux';
-import Select from './select';
+
+
+import Select from './Select';
 import ACTIONS from '../redux/aciton.js';
-import {Button} from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
+import ScrollTop from './ScrollTop';
+import {post} from '../../request';
 
 
 
@@ -29,7 +29,6 @@ import SaveIcon from '@mui/icons-material/Save';
 
 const LangFuntion = {
     cpp,
-    java,
     python,
     javascript,
 }
@@ -46,21 +45,64 @@ const getLangExtend = (extend, lang)=>{
         ]
 }
 
-
-
 class CodeArea extends Component {
     state = {
         inputContent: '',
         codeContent: '',
+        outputContent: '',
+        timeOutId: '',
+        resMsg: '',
+        waitCode: false,
+        clickAble: true,
+        snackBarOpen: false,
+        statusType: 'success'
     }
 
+    handleSnackClose = () => {
+        this.setState({snackBarOpen: false});
+    }
+
+    handleSnackMsg = (type, msg) => {
+        let statusType = '';
+        if (type === 0) statusType = 'info';
+        if (type === 200) statusType = 'success';
+        if (type === 233) statusType = 'warning';
+        if (type === 244) statusType = 'warning';
+        if (type === 555) statusType = 'error';
+        this.setState({statusType, resMsg: msg, snackBarOpen: true});
+    }
+
+
     handleFabClick = async () => {
-        let data = await post('/api/code', {
-            lang: this.props.lang,
-            code: this.state.codeContent,
-            input: this.state.inputContent
-        }, null)
-        this.props.runcode(this.state.codeContent, data.res, data.sta, data.msg);
+        if (this.state.snackBarOpen) this.handleSnackClose();
+
+        if (this.state.clickAble){
+
+            this.state.clickAble = false;
+            this.setState({waitCode: true});
+
+            this.state.timeOutId = setTimeout(() => {
+                this.state.clickAble = true;
+            }, 3000);
+
+            let data = await post('/api/code', {
+                lang: this.props.lang,
+                code: this.state.codeContent,
+                input: this.state.inputContent
+            }, null)
+            
+            console.log(data.code);
+            this.handleSnackMsg(data.code, data.msg);
+            this.setState({outputContent: data.res, waitCode: false});
+        } else {
+            clearTimeout(this.state.timeOutId);
+            this.handleSnackMsg(0, '操作太频繁啦，请３ｓ后重试！（´(ｪ)｀）');
+            this.state.timeOutId = setTimeout(() => {
+                this.state.clickAble = true;
+            }, 3000);
+        }
+
+
     }
     
     render() { 
@@ -68,7 +110,9 @@ class CodeArea extends Component {
             <React.Fragment>
                 <div id='Code'>
                     <div id='headLine'>
-                        <Typography sx={{marginBottom: 0}} variant="h5" gutterBottom component="div">
+
+
+                        <Typography id='back-to-top-anchor' sx={{marginBottom: 0}} variant="h5" gutterBottom component="div">
                             Coding 
                         </Typography>
                         <div style={{display: 'flex', alignItems: 'center'}}>
@@ -77,21 +121,39 @@ class CodeArea extends Component {
                         </div>
                         
                     </div>
+
+
                     <Card id='codeText' variant="outlined">
                         <CodeMirror
-                            ref={this.editor}
-                            minHeight='500px'
+                            minHeight='400px'
                             height='auto' 
                             theme={githubLight} 
                             extensions={getLangExtend(null, this.props.lang)} 
                             placeholder='(๑・∀・ฅ✧ Code here'
-                            onChange={e=>{this.setState({codeContent: e})}}
+                            onChange={e=>{this.state.codeContent = e}}
                         />
                     </Card>
-                    <Fab onClick={this.handleFabClick} sx={{position: 'fixed', bottom: '3rem', right: `3rem`}} color="secondary">
-                        Go
+
+                    <ScrollTop sx={{position: 'fixed', right: '1.5rem', bottom: '5rem'}}>
+                        <Fab size="small" aria-label="scroll back to top" color='secondary'>
+                            <KeyboardArrowUpIcon />
+                        </Fab>
+                    </ScrollTop>
+
+                    <Fab onClick={this.handleFabClick} sx={{position: 'fixed', bottom: '1rem', right: '1rem'}} color="secondary">
+                        {!this.state.waitCode ? 'Go' : <CircularProgress color="inherit" />}
                     </Fab>
 
+                    <Snackbar
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        open={this.state.snackBarOpen}
+                        onClose={this.handleSnackClose}
+                        autoHideDuration={3000}
+                    >
+                        <Alert onClose={this.handleSnackClose} severity={this.state.statusType} sx={{ width: '100%' }}>
+                            {this.state.resMsg}
+                        </Alert>
+                    </Snackbar>
                 </div>
                 <div id='inOut'>
                     <Card id='inputText' variant="outlined">
@@ -106,12 +168,12 @@ class CodeArea extends Component {
                                     highlightActiveLineGutter: false,
                                 }
                             }
-                            onChange={(e)=>{this.setState({ inputContent: e })}}
+                            onChange={(e)=>{this.state.inputContent = e;}}
                         />
                     </Card>
                     <Card id='outputText' variant="outlined">
                         <CodeMirror
-                            value={this.props.output}
+                            value={this.state.outputContent}
                             minHeight='100px' 
                             height='auto'
                             theme={githubLight} 
@@ -134,25 +196,11 @@ class CodeArea extends Component {
 const mapStateToProps = (state) => {
     return {
         lang: state.Language,
-        output: state.CodeOutput,
-        msg: state.RunMsg,
-        runStatus: state.RunStatus,
     }
 }
 
-const mapDispatchToProps = {
-    runcode: (code, res, sta, msg)=>{
-        return {
-            type: ACTIONS.RUNCODE,
-            code,
-            res,
-            sta,
-            msg
-        }
-    }
-}
  
-export default connect(mapStateToProps, mapDispatchToProps)( CodeArea );
+export default connect(mapStateToProps, null)( CodeArea );
 
 
 
