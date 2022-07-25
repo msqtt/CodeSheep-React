@@ -101,8 +101,6 @@ class CodeArea extends Component {
                 this.state.clickAble = true;
             }, 3000);
         }
-
-
     }
     
     render() { 
@@ -119,7 +117,6 @@ class CodeArea extends Component {
                             <Button variant="contained" color='secondary' style={{height: '2.5rem', marginRight: '1rem'}} endIcon={<SaveIcon />}>Save</Button>
                             <Select />
                         </div>
-                        
                     </div>
 
 

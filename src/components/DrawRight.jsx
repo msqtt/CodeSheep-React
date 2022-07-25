@@ -149,9 +149,9 @@ export default function PersistentDrawerRight(props) {
         </List>
         <Divider />
         <List>
-          {['Login In', 'Sign Up'].map((text, index) => (
+          {['Login', 'SignUp'].map((text, index) => (
             <ListItem key={text} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={()=>{navigator(`/${text}`);}}>
                 <ListItemIcon>
                     {index === 0 && <LoginIcon />}
                     {index === 1 && <ArrowUpwardIcon />}
