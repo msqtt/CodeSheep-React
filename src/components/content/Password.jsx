@@ -42,7 +42,9 @@ const Password = React.forwardRef((props, ref) => {
           <OutlinedInput
             {...props}
             seterror=''
-            inputRef={ref}
+            ref={ref}
+            realref=''
+            inputRef={props.realref}
             type={values.showPassword ? 'text' : 'password'}
             value={values.password}
             onChange={handleChange('password')}

@@ -85,15 +85,21 @@ class CodeArea extends Component {
                 this.state.clickAble = true;
             }, 3000);
 
-            let data = await post('/api/code', {
-                lang: this.props.lang,
-                code: this.state.codeContent,
-                input: this.state.inputContent
-            }, null)
-            
-            console.log(data.code);
-            this.handleSnackMsg(data.code, data.msg);
-            this.setState({outputContent: data.res, waitCode: false});
+            if(this.state.codeContent !== '' ){
+                let data = await post('/api/code-run', {
+                    lang: this.props.lang,
+                    code: this.state.codeContent,
+                    input: this.state.inputContent
+                }, null)
+                
+                console.log(data.code);
+                this.handleSnackMsg(data.code, data.msg);
+                this.setState({outputContent: data.res, waitCode: false});
+            } else {
+                this.handleSnackMsg(0, '啥都没写呢，你跑啥 （´(ｪ)｀）');
+                this.setState({waitCode: false});
+            }
+
         } else {
             clearTimeout(this.state.timeOutId);
             this.handleSnackMsg(0, '操作太频繁啦，请３ｓ后重试！（´(ｪ)｀）');
@@ -122,6 +128,7 @@ class CodeArea extends Component {
 
                     <Card id='codeText' variant="outlined">
                         <CodeMirror
+                            value={this.props.codeText}
                             minHeight='400px'
                             height='auto' 
                             theme={githubLight} 
@@ -193,6 +200,7 @@ class CodeArea extends Component {
 const mapStateToProps = (state) => {
     return {
         lang: state.Language,
+        codeText: state.CodeContent,
     }
 }
 

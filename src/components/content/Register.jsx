@@ -5,10 +5,12 @@ import { Component } from 'react';
 import { Tooltip, Typography, Card, Box, TextField, Button, Alert, Snackbar } from '@mui/material';
 import Password from './Password';
 
+import { post } from '../../request';
 
 
 
-class SignUp extends Component {
+
+class Register extends Component {
 
     state = { 
         values: {
@@ -34,38 +36,49 @@ class SignUp extends Component {
         this.setState({repasswdError: flag});
     }
 
-    handleSubmit = () => {
+    handleSubmit = async () => {
         let email = this.email.current.value;
         let passwd = this.passwd.current.value;
         let repasswd = this.repasswd.current.value;
 
         if (email === '' || passwd === '' || repasswd === '' ){
-            this.setState({
-                snackBarOpen: true,
-                snackBarStatus: 'warning',
-                vaildMsg: '不能留空啦 U￣ｰ￣U'
-            })
-           return;
+            this.handleSnackMsg(1, '不能留空啦 U￣ｰ￣U');
+            return;
         }
 
        if (this.state.emailError || this.state.passwdError || this.state.repasswdError){
-            this.setState({
-                snackBarOpen: true,
-                snackBarStatus: 'warning',
-                vaildMsg: '输入格式不正确喔 U￣ｰ￣U'
-            })
-           return;
+            this.handleSnackMsg(1, '输入格式不正确喔 U￣ｰ￣U');
+            return;
         }
 
         if (passwd !== repasswd) {
-            this.setState({
-                snackBarOpen: true,
-                snackBarStatus: 'warning',
-                vaildMsg: '两次密码输入不一致捏 U￣ｰ￣U'
-            })
+            this.handleSnackMsg(1, '两次密码输入不一致捏 U￣ｰ￣U');
             return;
         }
+
+        let data = await post('/api/user', {
+            email: email,
+            password: passwd
+        }, null)
+
+        this.handleSnackMsg(data.code, data.msg);
+
+        if (data.code == 200){
+            setTimeout(()=>{window.location.href='/Register';
+}, 1000);
+        }
+
     }
+
+    handleSnackMsg = (type, msg) => {
+        let statusType = '';
+        if (type == 0) statusType = 'info';
+        if (type == 1 || type == 244) statusType = 'warning';
+        if (type == 200) statusType = 'success';
+        if (type == 400) statusType = 'error';
+        this.setState({snackBarStatus: statusType, vaildMsg: msg, snackBarOpen: true});
+    }
+
     handleSnackClose = () => {
         this.setState({snackBarOpen: false})
     }
@@ -97,7 +110,7 @@ class SignUp extends Component {
             <React.Fragment>
                 <header style={{marginTop: `calc(3rem + 4px)`}}></header>
                 <Typography sx={{marginBottom: '12px'}} variant="h5" gutterBottom component="div">
-                    SignUp
+                    Register
                 </Typography>
                 <Card variant="outlined">
 
@@ -118,23 +131,23 @@ class SignUp extends Component {
                         <Password
                             id='passwd'
                             hold='Passwd *'
-                            ref={this.passwd}
+                            realref={this.passwd}
                             error={this.state.passwdError}
                             seterror={this.setPasswdError}
                         />
                     </Tooltip>
                     <Tooltip title='请与上栏保持一致'>
                         <Password
-                            id='recheck'
+                            id='repasswd'
                             hold='Re-passwd *'
-                            ref={this.repasswd}
+                            realref={this.repasswd}
                             error={this.state.repasswdError}
                             seterror={this.setRePasswdError}
                             sx={{marginBottom: '2rem'}}
                         />
                     </Tooltip>
 
-                    <Button sx={{width: '14.5rem'}} onClick={this.handleSubmit} variant='contained' color="secondary" size='large'>SignUp</Button>
+                    <Button sx={{width: '14.5rem'}} onClick={this.handleSubmit} variant='contained' color="secondary" size='large'>Register</Button>
                     </Box>
 
                     <Snackbar
@@ -154,4 +167,4 @@ class SignUp extends Component {
     }
 }
  
-export default SignUp;
+export default Register;

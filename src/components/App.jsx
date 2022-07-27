@@ -11,7 +11,7 @@ import NotFound from './content/NotFound';
 import Saving from './content/Saving';
 import Setting from './content/Setting';
 import Login from './content/Login';
-import SignUp from './content/SignUp';
+import Register from './content/Register';
 
 
 import myTheme from './myTheme.js';
@@ -29,7 +29,7 @@ class App extends Component {
                         <Route path='/Saving' element={<Saving />}  />
                         <Route path='/Setting' element={<Setting />}  />
                         <Route path='/Login' element={<Login />}  />
-                        <Route path='/SignUp' element={<SignUp />}  />
+                        <Route path='/Register' element={<Register />}  />
                         <Route path='/404' element={<NotFound />}  />
                         <Route path='*' element={<Navigate replace to='/404'/>}  />
                     </Routes>

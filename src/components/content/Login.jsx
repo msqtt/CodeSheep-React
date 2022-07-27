@@ -4,7 +4,12 @@ import { Component } from 'react';
 
 import { Tooltip, Typography, Card, Box, TextField, Button, Alert, Snackbar } from '@mui/material';
 import { Checkbox, FormControlLabel } from '@mui/material';
+
+import { connect } from 'react-redux';
+import ACTIONS from '../redux/aciton';
+
 import Password from './Password';
+import {post} from '../../request';
 
 
 
@@ -31,10 +36,10 @@ class Login extends Component {
         this.setState({passwdError: flag});
     }
 
-    handleSubmit = () => {
+    handleSubmit = async () => {
         let email = this.email.current.value;
         let passwd = this.passwd.current.value;
-
+        console.log(this.props.loginStatus);
         if (email === '' || passwd === ''){
             this.setState({
                 snackBarOpen: true,
@@ -53,6 +58,26 @@ class Login extends Component {
            return;
         }
 
+        let data = await post('/api/user-login', {
+            email,
+            password: passwd
+        }, null);
+
+        this.handleSnackMsg(data.code, data.msg);
+
+        if (data.code == 200){
+            this.props.setLogin();
+            // setTimeout(()=>{window.location.href='/';}, 1000);
+        }
+
+    }
+    handleSnackMsg = (type, msg) => {
+        let statusType = '';
+        if (type == 0) statusType = 'info';
+        if (type == 200) statusType = 'success';
+        if (type == 244 || type == 404) statusType = 'warning';
+        if (type == 405) statusType = 'error';
+        this.setState({snackBarStatus: statusType, vaildMsg: msg, snackBarOpen: true});
     }
     handleSnackClose = () => {
         this.setState({snackBarOpen: false})
@@ -76,7 +101,6 @@ class Login extends Component {
         super(props);
         this.email = React.createRef();
         this.passwd = React.createRef();
-        this.repasswd = React.createRef();
     }
 
 
@@ -94,8 +118,8 @@ class Login extends Component {
                     <Tooltip title='请输入正确的邮箱'>
                         <TextField
                             error={this.state.emailError}
-                            type='email'
                             inputRef={this.email}
+                            type='email'
                             id="outlined-required"
                             label="Email *"
                             onChange={this.handleEmailChange}
@@ -106,7 +130,7 @@ class Login extends Component {
                         <Password
                             id='passwd'
                             hold='Passwd *'
-                            ref={this.passwd}
+                            realref={this.passwd}
                             error={this.state.passwdError}
                             seterror={this.setPasswdError}
                         />
@@ -136,5 +160,20 @@ class Login extends Component {
         );
     }
 }
+
+const mapStateToProps = (state)=> {
+    return {
+        loginStatus: state.LoginStatus,
+    }
+}
+
+const mapDispatchToProps = {
+    setLogin: ()=>{
+        return {
+            type: ACTIONS.SETLOGIN,
+            bool: true,
+        }
+    }
+}
  
-export default Login;
+export default connect(mapStateToProps, mapDispatchToProps)( Login );
