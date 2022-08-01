@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import ACTIONS from '../redux/aciton';
 
 import Password from './Password';
-import {post} from '../../request';
+import {POST} from '../utils/request';
 
 
 
@@ -26,10 +26,11 @@ class Login extends Component {
         snackBarStatus: 'success',
         emailError: false,
         passwdError: false,
+        rememberMe: false,
     }
 
     handleCheckBox = () => {
-        console.log(true);
+        this.state.rememberMe = !this.state.rememberMe;
     }
 
     setPasswdError = (flag) => {
@@ -39,7 +40,6 @@ class Login extends Component {
     handleSubmit = async () => {
         let email = this.email.current.value;
         let passwd = this.passwd.current.value;
-        console.log(this.props.loginStatus);
         if (email === '' || passwd === ''){
             this.setState({
                 snackBarOpen: true,
@@ -58,25 +58,37 @@ class Login extends Component {
            return;
         }
 
-        let data = await post('/api/user-login', {
-            email,
-            password: passwd
+        let data = await POST('/api/user-login', {
+            user: {
+                email,
+                password: passwd,
+            },
+            remember: this.state.rememberMe
         }, null);
 
-        this.handleSnackMsg(data.code, data.msg);
+        if (data !== ''){
+            this.handleSnackMsg(data.code, data.msg);
 
-        if (data.code == 200){
-            this.props.setLogin();
-            // setTimeout(()=>{window.location.href='/';}, 1000);
+            if (data.code === 200){
+                let date = new Date();
+                if (this.state.rememberMe) date.setDate(date.getDate()+7)
+                else date.setDate(date.getDate()+1);
+
+                localStorage.setItem("email", email);
+                localStorage.setItem("time", date);
+                setTimeout(()=>{window.location.href='/';}, 1000);
+            }
+        } else {
+            this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
         }
 
     }
     handleSnackMsg = (type, msg) => {
         let statusType = '';
-        if (type == 0) statusType = 'info';
-        if (type == 200) statusType = 'success';
-        if (type == 244 || type == 404) statusType = 'warning';
-        if (type == 405) statusType = 'error';
+        if (type === 0) statusType = 'info';
+        if (type === 200) statusType = 'success';
+        if (type === 244 || type === 404) statusType = 'warning';
+        if (type === 405) statusType = 'error';
         this.setState({snackBarStatus: statusType, vaildMsg: msg, snackBarOpen: true});
     }
     handleSnackClose = () => {
@@ -137,8 +149,8 @@ class Login extends Component {
                     </Tooltip>
 
                     <FormControlLabel
-                        label="remember me a week"
-                        control={<Checkbox defaultChecked onChange={this.handleCheckBox} color="secondary" />}
+                        label="Remember me a week"
+                        control={<Checkbox onChange={this.handleCheckBox} color="secondary" />}
                     />
 
                     <Button sx={{width: '14.5rem'}} onClick={this.handleSubmit} variant='contained' color="secondary" size='large'>Login</Button>
@@ -167,13 +179,5 @@ const mapStateToProps = (state)=> {
     }
 }
 
-const mapDispatchToProps = {
-    setLogin: ()=>{
-        return {
-            type: ACTIONS.SETLOGIN,
-            bool: true,
-        }
-    }
-}
  
-export default connect(mapStateToProps, mapDispatchToProps)( Login );
+export default connect(mapStateToProps, null)( Login );

@@ -23,9 +23,13 @@ import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import SaveIcon from '@mui/icons-material/Save';
 import LoginIcon from '@mui/icons-material/Login';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
 import {useNavigate} from 'react-router-dom';
+import { useSelector, useDispatch} from 'react-redux';
 
 
+import ACTIONS from './redux/aciton';
 
 
 
@@ -78,6 +82,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 
 export default function PersistentDrawerRight(props) {
+  const loginStatus = useSelector(state=>state.LoginStatus);
+  const dispatch = useDispatch();
   const navigator = useNavigate();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -90,14 +96,35 @@ export default function PersistentDrawerRight(props) {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('email');
+    localStorage.removeItem('time');
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    dispatch({type: ACTIONS.SETLOGIN, bool: false});
+  }
+
+  const checkLoginText = (text) => {
+    if (loginStatus){
+        let email = localStorage.getItem('email');
+        if (text === 'Login') return email;
+        if (text === 'Register') return 'Logout';
+    } else {
+        return text
+    }
+  }
+
+  const loginFunction = (text) => {
+    if (text === 'Login') return ()=>{navigator('/Setting')};
+    else return handleLogout;
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-            <CodeIcon />
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-            &nbsp;Coding Sheep
+          <Typography variant="h5" noWrap sx={{ flexGrow: 1 }} component="div">
+            Ꮚ`ꈊ´Ꮚ&nbsp;Code Sheep
           </Typography>
 
           <IconButton
@@ -136,7 +163,7 @@ export default function PersistentDrawerRight(props) {
         <List>
           {['Coding', 'Saving', 'Setting'].map((text, index) => (
             <ListItem key={text} disablePadding>
-              <ListItemButton onClick={()=>{navigator(`/${text}`);}}>
+              <ListItemButton onClick={()=>{navigator(`/${text}`);}} disabled={text === 'Saving' && !loginStatus}>
                 <ListItemIcon>
                     {index === 0 && <CodeIcon/>}
                     {index === 1 && <SaveIcon/>}
@@ -151,12 +178,12 @@ export default function PersistentDrawerRight(props) {
         <List>
           {['Login', 'Register'].map((text, index) => (
             <ListItem key={text} disablePadding>
-              <ListItemButton onClick={()=>{navigator(`/${text}`);}}>
+              <ListItemButton onClick={!loginStatus ?  ()=>{navigator(`/${text}`)} : loginFunction(text)}>
                 <ListItemIcon>
-                    {index === 0 && <LoginIcon />}
-                    {index === 1 && <ArrowUpwardIcon />}
+                    {index === 0 && ( !loginStatus ? <LoginIcon /> : <PersonIcon /> )}
+                    {index === 1 && ( !loginStatus ? <ArrowUpwardIcon /> : <LogoutIcon /> )}
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary={checkLoginText(text)} />
               </ListItemButton>
             </ListItem>
           ))}

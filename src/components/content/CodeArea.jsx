@@ -3,11 +3,11 @@ import * as React from 'react'
 import { Component } from 'react';
 
 import { Fab, Card, Button, Typography, CircularProgress, Alert, Snackbar } from '@mui/material/';
-
-
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
+import TextField from '@mui/material/TextField';
 import CodeMirror from '@uiw/react-codemirror';
 import {githubLight} from '@uiw/codemirror-theme-github';
 import {cpp} from '@codemirror/lang-cpp';
@@ -20,7 +20,7 @@ import { connect } from 'react-redux';
 import Select from './Select';
 import ACTIONS from '../redux/aciton.js';
 import ScrollTop from './ScrollTop';
-import {post} from '../../request';
+import {POST} from '../utils/request';
 
 
 
@@ -55,7 +55,14 @@ class CodeArea extends Component {
         waitCode: false,
         clickAble: true,
         snackBarOpen: false,
-        statusType: 'success'
+        statusType: 'success',
+        saveWindow: false,
+        fileNameError: false,
+    }
+
+    constructor(props){
+        super(props);
+        this.filename = React.createRef();
     }
 
     handleSnackClose = () => {
@@ -66,9 +73,9 @@ class CodeArea extends Component {
         let statusType = '';
         if (type === 0) statusType = 'info';
         if (type === 200) statusType = 'success';
-        if (type === 233) statusType = 'warning';
+        if (type === 233 || type === 300) statusType = 'warning';
         if (type === 244) statusType = 'warning';
-        if (type === 555) statusType = 'error';
+        if (type === 555 || type === 400) statusType = 'error';
         this.setState({statusType, resMsg: msg, snackBarOpen: true});
     }
 
@@ -86,15 +93,18 @@ class CodeArea extends Component {
             }, 3000);
 
             if(this.state.codeContent !== '' ){
-                let data = await post('/api/code-run', {
-                    lang: this.props.lang,
+                let data = await POST('/api/code-run', {
+                    language: this.props.lang,
                     code: this.state.codeContent,
                     input: this.state.inputContent
                 }, null)
                 
-                console.log(data.code);
-                this.handleSnackMsg(data.code, data.msg);
-                this.setState({outputContent: data.res, waitCode: false});
+                if (data !== ''){
+                    this.handleSnackMsg(data.code, data.msg);
+                    this.setState({outputContent: data.res, waitCode: false});
+                } else {
+                    this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
+                }
             } else {
                 this.handleSnackMsg(0, '啥都没写呢，你跑啥 （´(ｪ)｀）');
                 this.setState({waitCode: false});
@@ -108,6 +118,61 @@ class CodeArea extends Component {
             }, 3000);
         }
     }
+
+    handleSave = () => {
+        this.setState({saveWindow: true});
+    }
+
+    handleFileNameVaild = (e) => {
+        let fileName = e.target.value;
+        let fileNameReg = /^\w{1,125}$/;
+
+        if(fileName !== '' && !fileNameReg.test(fileName)){
+            if (!this.state.fileNameError)
+                this.setState({fileNameError: true});
+        } else {
+            if (this.state.fileNameError)
+                this.setState({fileNameError: false});
+        }
+    }
+
+    handleSaveConfirm = async () => {
+        let fileName = this.filename.current.value;
+
+        if (this.state.codeContent === ''){
+            this.handleSnackMsg(0, '啥都没写呢，你存啥 U￣ｰ￣U');
+            return;
+        }
+
+        if (fileName === ''){
+            this.handleSnackMsg(0, '文件名不能为空 U￣ｰ￣U');
+            return;
+        }
+
+        if (this.state.fileNameError){
+            this.handleSnackMsg(0, '文件名格式不正确 U￣ｰ￣U');
+            return;
+        }
+        
+        let data = await POST('/api/code', {
+            language: this.props.lang,
+            fileName: fileName,
+            code: this.state.codeContent,
+        }, null)
+        
+        if (data !== ''){
+            this.handleSnackMsg(data.code, data.msg);
+
+            if (data.code === 200){
+                console.log("success");
+                this.setState({saveWindow: false});
+            }
+        } else {
+            this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
+        }
+
+    }
+    
     
     render() { 
         return ( 
@@ -120,12 +185,27 @@ class CodeArea extends Component {
                             Coding 
                         </Typography>
                         <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Button variant="contained" color='secondary' style={{height: '2.5rem', marginRight: '1rem'}} endIcon={<SaveIcon />}>Save</Button>
+                            <Button onClick={this.handleSave} variant="contained" color='secondary' disabled={!this.props.loginStatus} style={{height: '2.5rem', marginRight: '1rem'}} endIcon={<SaveIcon />}>Save</Button>
                             <Select />
                         </div>
                     </div>
 
-
+                    <Dialog open={this.state.saveWindow}>
+                        <DialogTitle>Saving</DialogTitle>
+                        <DialogContent>
+                        <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
+                            <TextField inputRef={this.filename} error={this.state.fileNameError} onChange={this.handleFileNameVaild} id="outlined-basic" sx={{marginTop: '6px'}} label="FileName" variant="outlined" />
+                        </Tooltip>
+                            <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '2rem'}}>
+                                <Button onClick={this.handleSaveConfirm} sx={{width: '45%', height: '3rem'}} variant="contained" color="secondary">
+                                  Save
+                                </Button>
+                                <Button sx={{width: '45%', height: '3rem'}} onClick={()=>{this.setState({saveWindow: false, fileNameError: false})}} variant="contained" color="primary">
+                                  Cancel
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                     <Card id='codeText' variant="outlined">
                         <CodeMirror
                             value={this.props.codeText}
@@ -201,6 +281,7 @@ const mapStateToProps = (state) => {
     return {
         lang: state.Language,
         codeText: state.CodeContent,
+        loginStatus: state.LoginStatus
     }
 }
 

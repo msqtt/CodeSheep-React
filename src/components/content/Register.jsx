@@ -5,7 +5,7 @@ import { Component } from 'react';
 import { Tooltip, Typography, Card, Box, TextField, Button, Alert, Snackbar } from '@mui/material';
 import Password from './Password';
 
-import { post } from '../../request';
+import { POST } from '../utils/request';
 
 
 
@@ -56,18 +56,21 @@ class Register extends Component {
             return;
         }
 
-        let data = await post('/api/user', {
+        let data = await POST('/api/user', {
             email: email,
             password: passwd
         }, null)
 
-        this.handleSnackMsg(data.code, data.msg);
+        if (data !== ''){
+            this.handleSnackMsg(data.code, data.msg);
 
-        if (data.code == 200){
-            setTimeout(()=>{window.location.href='/Register';
-}, 1000);
+            if (data.code == 200){
+                setTimeout(()=>{window.location.href='/Login';
+    }, 2000);
+            }
+        } else {
+            this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
         }
-
     }
 
     handleSnackMsg = (type, msg) => {

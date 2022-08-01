@@ -21,7 +21,6 @@ code {
     align-items: center;
 }
 
-
 #inOut {
     display: grid;
     grid-template-columns: repeat(2, 50%);
@@ -44,4 +43,5 @@ footer {
 
 footer > a {
     text-decoration: none;
+    color: #4e6e8e
 }
