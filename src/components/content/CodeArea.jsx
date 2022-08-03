@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Component } from 'react';
 
 import { Fab, Card, Button, Typography, CircularProgress, Alert, Snackbar } from '@mui/material/';
-import { Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 import { Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -18,9 +18,10 @@ import { connect } from 'react-redux';
 
 
 import Select from './Select';
-import ACTIONS from '../redux/aciton.js';
 import ScrollTop from './ScrollTop';
-import {POST} from '../utils/request';
+
+import ACTIONS from '../redux/aciton.js';
+import {POST, PUT} from '../utils/request';
 
 
 
@@ -47,8 +48,8 @@ const getLangExtend = (extend, lang)=>{
 
 class CodeArea extends Component {
     state = {
-        inputContent: '',
         codeContent: '',
+        inputContent: '',
         outputContent: '',
         timeOutId: '',
         resMsg: '',
@@ -58,11 +59,13 @@ class CodeArea extends Component {
         statusType: 'success',
         saveWindow: false,
         fileNameError: false,
+        updateWindow: false,
     }
 
     constructor(props){
         super(props);
         this.filename = React.createRef();
+        this.state.codeContent = this.props.codeText;
     }
 
     handleSnackClose = () => {
@@ -92,10 +95,10 @@ class CodeArea extends Component {
                 this.state.clickAble = true;
             }, 3000);
 
-            if(this.state.codeContent !== '' ){
+            if(this.props.codeText !== '' ){
                 let data = await POST('/api/code-run', {
                     language: this.props.lang,
-                    code: this.state.codeContent,
+                    code: this.props.codeText,
                     input: this.state.inputContent
                 }, null)
                 
@@ -120,7 +123,13 @@ class CodeArea extends Component {
     }
 
     handleSave = () => {
-        this.setState({saveWindow: true});
+        let updateCode = this.props.updateCode;
+
+        if (updateCode){
+            this.setState({updateWindow: true});
+        } else {
+            this.setState({saveWindow: true});
+        }
     }
 
     handleFileNameVaild = (e) => {
@@ -139,7 +148,7 @@ class CodeArea extends Component {
     handleSaveConfirm = async () => {
         let fileName = this.filename.current.value;
 
-        if (this.state.codeContent === ''){
+        if (this.props.codeText === ''){
             this.handleSnackMsg(0, '啥都没写呢，你存啥 U￣ｰ￣U');
             return;
         }
@@ -156,19 +165,44 @@ class CodeArea extends Component {
         
         let data = await POST('/api/code', {
             language: this.props.lang,
-            fileName: fileName,
-            code: this.state.codeContent,
+            fileName,
+            code: this.props.codeText,
         }, null)
         
         if (data !== ''){
             this.handleSnackMsg(data.code, data.msg);
 
             if (data.code === 200){
-                console.log("success");
+                this.props.setOpenCodeStatus(fileName);
+                this.props.setUpdateCode(true);
                 this.setState({saveWindow: false});
             }
         } else {
             this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
+        }
+
+    }
+
+    handleBlur = () => {
+        let codeContent = this.state.codeContent;
+        this.props.saveCode(codeContent);
+    }
+
+    handleUpdateCode = async () => {
+        let language = this.props.lang;
+        let fileName = this.props.openedCodeName;
+        let code = this.props.codeText;
+        
+        let data = await PUT('api/code', {
+            language,
+            fileName,
+            code
+        }, null);
+            
+        
+        if (data !== ''){
+            this.setState({updateWindow: false});
+            this.handleSnackMsg(data.code, data.msg);
         }
 
     }
@@ -179,8 +213,6 @@ class CodeArea extends Component {
             <React.Fragment>
                 <div id='Code'>
                     <div id='headLine'>
-
-
                         <Typography id='back-to-top-anchor' sx={{marginBottom: 0}} variant="h5" gutterBottom component="div">
                             Coding 
                         </Typography>
@@ -189,6 +221,21 @@ class CodeArea extends Component {
                             <Select />
                         </div>
                     </div>
+
+                    <Dialog open={this.state.updateWindow}>
+                        <DialogTitle>Saving</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>你已经打开了一个代码喔，要如何保存呢?</DialogContentText>
+                            <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '2rem'}}>
+                                <Button onClick={this.handleUpdateCode} sx={{width: '45%', height: '3rem'}} variant="contained" color="secondary">
+                                  保存到原文件
+                                </Button>
+                                <Button sx={{width: '45%', height: '3rem'}} onClick={()=>{this.setState({updateWindow: false, saveWindow: true})}} variant="contained" color="primary">
+                                  另存一个新文件
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
 
                     <Dialog open={this.state.saveWindow}>
                         <DialogTitle>Saving</DialogTitle>
@@ -206,6 +253,7 @@ class CodeArea extends Component {
                             </div>
                         </DialogContent>
                     </Dialog>
+
                     <Card id='codeText' variant="outlined">
                         <CodeMirror
                             value={this.props.codeText}
@@ -214,7 +262,8 @@ class CodeArea extends Component {
                             theme={githubLight} 
                             extensions={getLangExtend(null, this.props.lang)} 
                             placeholder='(๑・∀・ฅ✧ Code here'
-                            onChange={e=>{this.state.codeContent = e}}
+                            onChange={e=>{ this.state.codeContent = e }}
+                            onBlur={this.handleBlur}
                         />
                     </Card>
 
@@ -281,15 +330,33 @@ const mapStateToProps = (state) => {
     return {
         lang: state.Language,
         codeText: state.CodeContent,
-        loginStatus: state.LoginStatus
+        loginStatus: state.LoginStatus,
+        updateCode: state.UpdateCode,
+        openedCodeName: state.OpenedCodeName,
+    }
+}
+
+const mapDispatchToProps = {
+    saveCode: (code) => {
+        return {
+            type: ACTIONS.SETCODE,
+            code
+        }
+    },
+    setUpdateCode: (bool) => {
+        return {
+            type: ACTIONS.UPDATECODE,
+            bool
+        }
+    },
+    setOpenCodeStatus: (name) => {
+        return {
+            type: ACTIONS.OPENCODE,
+            name,
+        }
     }
 }
 
  
-export default connect(mapStateToProps, null)( CodeArea );
-
-
-
-
-
+export default connect(mapStateToProps, mapDispatchToProps)( CodeArea );
 

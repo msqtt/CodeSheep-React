@@ -6,7 +6,6 @@ import { Tooltip, Typography, Card, Box, TextField, Button, Alert, Snackbar } fr
 import { Checkbox, FormControlLabel } from '@mui/material';
 
 import { connect } from 'react-redux';
-import ACTIONS from '../redux/aciton';
 
 import Password from './Password';
 import {POST} from '../utils/request';
@@ -115,6 +114,12 @@ class Login extends Component {
         this.passwd = React.createRef();
     }
 
+    componentDidMount(){
+        console.log(this.props.codeText);
+        if (this.props.codeText !== '')
+            this.handleSnackMsg(0, "(｀・ω´・ 登录前请注意保存好代码，本操作会导致代码丢失");
+    }
+
 
     render() { 
         return ( 
@@ -176,6 +181,7 @@ class Login extends Component {
 const mapStateToProps = (state)=> {
     return {
         loginStatus: state.LoginStatus,
+        codeText: state.CodeContent
     }
 }
 

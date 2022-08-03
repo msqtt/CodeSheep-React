@@ -2,9 +2,9 @@ import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import CssBaseline from '@mui/material/CssBaseline';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
@@ -16,7 +16,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-
 
 import CodeIcon from '@mui/icons-material/Code';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
@@ -32,7 +31,6 @@ import { useSelector, useDispatch} from 'react-redux';
 import ACTIONS from './redux/aciton';
 
 
-
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -43,13 +41,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginRight: -drawerWidth,
+    marginLeft: `-${drawerWidth}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
-      marginRight: 0,
+      marginLeft: 0,
     }),
   }),
 );
@@ -63,11 +61,11 @@ const AppBar = styled(MuiAppBar, {
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginRight: drawerWidth,
   }),
 }));
 
@@ -77,11 +75,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-start',
+  justifyContent: 'flex-end',
 }));
 
-
-export default function PersistentDrawerRight(props) {
+export default function PersistentDrawerLeft(props) {
   const loginStatus = useSelector(state=>state.LoginStatus);
   const dispatch = useDispatch();
   const navigator = useNavigate();
@@ -123,40 +120,36 @@ export default function PersistentDrawerRight(props) {
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Typography variant="h5" noWrap sx={{ flexGrow: 1 }} component="div">
-            Ꮚ`ꈊ´Ꮚ&nbsp;Code Sheep
-          </Typography>
-
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            edge="end"
             onClick={handleDrawerOpen}
-            sx={{ ...(open && { display: 'none' }) }}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
           >
             <MenuIcon />
           </IconButton>
+          <Typography variant="h5" noWrap sx={{ flexGrow: 1 }} component="div">
+            Ꮚ`ꈊ´Ꮚ&nbsp;Code Sheep
+          </Typography>
         </Toolbar>
-      </AppBar>
-      <Main open={open}>
-            <header style={{marginTop: '2.5rem'}}></header>
-          {props.children}
-      </Main>
+      </AppBar>//`
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
+            boxSizing: 'border-box',
           },
         }}
         variant="persistent"
-        anchor="right"
+        anchor="left"
         open={open}
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -173,9 +166,11 @@ export default function PersistentDrawerRight(props) {
               </ListItemButton>
             </ListItem>
           ))}
+
         </List>
         <Divider />
         <List>
+
           {['Login', 'Register'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton onClick={!loginStatus ?  ()=>{navigator(`/${text}`)} : loginFunction(text)}>
@@ -187,8 +182,13 @@ export default function PersistentDrawerRight(props) {
               </ListItemButton>
             </ListItem>
           ))}
+
         </List>
       </Drawer>
+      <Main open={open}>
+        <header style={{marginTop: '2.5rem'}}></header>
+          {props.children}
+      </Main>
     </Box>
   );
 }

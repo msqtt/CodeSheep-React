@@ -6,6 +6,7 @@ import { Tooltip, Typography, Card, Box, TextField, Button, Alert, Snackbar } fr
 import Password from './Password';
 
 import { POST } from '../utils/request';
+import { connect } from 'react-redux';
 
 
 
@@ -64,7 +65,7 @@ class Register extends Component {
         if (data !== ''){
             this.handleSnackMsg(data.code, data.msg);
 
-            if (data.code == 200){
+            if (data.code === 200){
                 setTimeout(()=>{window.location.href='/Login';
     }, 2000);
             }
@@ -75,10 +76,10 @@ class Register extends Component {
 
     handleSnackMsg = (type, msg) => {
         let statusType = '';
-        if (type == 0) statusType = 'info';
-        if (type == 1 || type == 244) statusType = 'warning';
-        if (type == 200) statusType = 'success';
-        if (type == 400) statusType = 'error';
+        if (type === 0) statusType = 'info';
+        if (type === 1 || type === 244) statusType = 'warning';
+        if (type === 200) statusType = 'success';
+        if (type === 400) statusType = 'error';
         this.setState({snackBarStatus: statusType, vaildMsg: msg, snackBarOpen: true});
     }
 
@@ -107,6 +108,12 @@ class Register extends Component {
         this.repasswd = React.createRef();
     }
 
+
+    componentDidMount(){
+        console.log(this.props.codeText);
+        if (this.props.codeText !== '')
+            this.handleSnackMsg(0, "(｀・ω´・ 注册前请注意保存好代码，本操作会导致代码丢失");
+    }
 
     render() { 
         return ( 
@@ -169,5 +176,11 @@ class Register extends Component {
         );
     }
 }
+
+const mapStateToProps = (state)=> {
+    return {
+        codeText: state.CodeContent
+    }
+}
  
-export default Register;
+export default connect(mapStateToProps, null)( Register );

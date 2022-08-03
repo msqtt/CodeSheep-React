@@ -4,6 +4,8 @@ const reducer = (state={
     Language: 'cpp',
     CodeContent: '',
     LoginStatus: false,
+    UpdateCode: false,
+    OpenedCodeName: '',
 }, action) => {
     switch(action.type){
         case ACTIONS.SELECT_LANG: 
@@ -11,10 +13,20 @@ const reducer = (state={
                 ...state,
                 Language: action.lang,
             }
-        case ACTIONS.SAVECODE: 
+        case ACTIONS.SETCODE: 
             return {
                 ...state,
                 CodeContent: action.code,
+            }
+        case ACTIONS.UPDATECODE: 
+            return {
+                ...state,
+                UpdateCode: action.bool
+            }
+        case ACTIONS.OPENCODE: 
+            return {
+                ...state,
+                OpenedCodeName: action.name,
             }
         case ACTIONS.SETLOGIN: 
             return {

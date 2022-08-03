@@ -6,13 +6,17 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { Box, Skeleton, Pagination, Snackbar, Alert } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
 
+import { connect } from 'react-redux';
 
+import ACTIONS from '../redux/aciton';
 import { GET, DELETE } from '../utils/request';
-
+import {Navigate} from 'react-router-dom';
 
 const createData = (fileName, language, time, code, input) => {
   return { fileName, language, time, code, input};
 }
+
+
 
 class Saving extends Component {
 
@@ -22,11 +26,13 @@ class Saving extends Component {
         pageNum: 1,
         pageSize: 1,
         deleteWindow: false,
+        openWindow: false,
         seleteCodeType: '',
         seleteCodeName: '',
         resMsg: '',
         snackBarOpen: false,
         statusType: 'success',
+        navigate: false,
 
         rows: [
           createData('ready1', '???', 0, null, null),
@@ -40,9 +46,7 @@ class Saving extends Component {
 
     componentDidMount = async () => {
         let pageNum = this.state.pageNum;
-        let data = await GET('/api/code', {
-            pageNum,
-        }, null)
+        let data = await GET(`/api/codes/5/${pageNum}`, null, null)
 
         if (data !== null){
             let rows = data.list.map(code =>{
@@ -51,12 +55,15 @@ class Saving extends Component {
             });
 
             this.setState({pageSize: data.pages, rows, loadCode: true});
+            if (data.pages === 0){
+                this.handleSnackMsg(0, "(｀・ω´・ 你还没有保存的代码，快去试试");
+            }
         }
 
     }
 
     handleChangePage = async (event, value) => {
-        let data = await GET(`/api/code?pageNum=${value}`, null, null)
+        let data = await GET(`/api/codes/5/${value}`, null, null)
 
         if (data !== null){
 
@@ -90,7 +97,14 @@ class Saving extends Component {
         let fileName = this.state.seleteCodeName;
         let language = this.state.seleteCodeType;
 
-        let data = await DELETE(`/api/code?fileName=${fileName}&&language=${language}`, null, null);
+        let fileNameP = this.props.fileName;
+        let languageP = this.props.language;
+        if (this.props.updateCode && languageP === language && fileNameP === fileName){
+            this.props.setUpdateCode(false);
+            this.props.setOpenCodeStatus('');
+        }
+        this.setState({deleteWindow: false});
+        let data = await DELETE(`/api/code/${language}/${fileName}`, null, null);
 
         if (data !== ''){
             this.handleChangePage(null, this.state.pageNum);
@@ -98,12 +112,60 @@ class Saving extends Component {
         } else {
             this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
         }
-            this.setState({deleteWindow: false});
+    }
+
+    handleOpenBtn = async (row) => {
+        if (this.props.updateCode || this.props.codeText !== ''){
+            if (this.props.updateCode && this.props.language === row.language && this.props.fileName === row.fileName){
+                this.handleSnackMsg(0, '该代码已经打开了喔 (´･д･｀)');
+                return;
+            }
+            this.setState({openWindow: true, seleteCodeType: row.language, seleteCodeName: row.fileName});
+        } else {
+            let language = row.language;
+            let fileName = row.fileName;
+
+            let data = await GET(`/api/code/${language}/${fileName}`, null, null);
+
+            if (data !== ''){
+                this.handleSnackMsg(data.code, data.msg);
+
+                if (data.code === 200){
+                    this.props.openCode(data.content);
+                    this.props.selectLanguage(language);
+                    this.props.setUpdateCode(true);
+                    this.props.setOpenCodeStatus(row.fileName);
+                    this.setState({navigate: true});
+                }
+            }
+        }
+    }
+
+    handleOpenConfirmBtn = async () => {
+        let language = this.state.seleteCodeType;
+        let fileName = this.state.seleteCodeName;
+
+        let data = await GET(`/api/code/${language}/${fileName}`, null, null);
+
+        if (data !== ''){
+            this.handleSnackMsg(data.code, data.msg);
+
+            if (data.code === 200){
+                this.props.openCode(data.content);
+                this.props.selectLanguage(language);
+                this.props.setUpdateCode(true);
+                this.props.setOpenCodeStatus(fileName);
+                this.setState({navigate: true});
+            } else {
+                this.setState({openWindow: false});
+            }
+        }
     }
 
     render() { 
         return ( 
             <React.Fragment>
+            {this.state.navigate && <Navigate to='/'></Navigate>}
             <header style={{marginTop: `calc(3rem + 4px)`}}></header>
             <Typography sx={{marginBottom: '12px'}} variant="h5" gutterBottom component="div">
                 Saving 
@@ -135,6 +197,22 @@ class Saving extends Component {
                     </div>
                 </DialogContent>
             </Dialog>
+            <Dialog open={this.state.openWindow}>
+                <DialogTitle>Open Code</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        还有代码正在编辑呢，如果打开它会被覆盖掉喔，确认要打开吗？
+                    </DialogContentText>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '2rem'}}>
+                        <Button onClick={this.handleOpenConfirmBtn} sx={{width: '45%', height: '3rem'}} variant="contained" color="secondary">
+                          Open
+                        </Button>
+                        <Button sx={{width: '45%', height: '3rem'}} onClick={()=>{this.setState({openWindow: false})}} variant="contained" color="primary">
+                          Cancel
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             <Card variant="outlined">
                 <TableContainer component={Paper}>
@@ -144,7 +222,7 @@ class Saving extends Component {
                         <TableCell>FileName</TableCell>
                         <TableCell align="left">Language</TableCell>
                         <TableCell align="left">Time</TableCell>
-                        <TableCell align="right">Action</TableCell>
+                        <TableCell align="right">Action&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -160,7 +238,7 @@ class Saving extends Component {
                           <TableCell align="left">{this.state.loadCode ? row.time : (<Skeleton variant="text"  height={32}/>)}</TableCell>
 
                           <TableCell align="right">
-                          {this.state.loadCode ? <div><Button variant="contained" color="secondary">打开</Button>
+                          {this.state.loadCode ? <div><Button variant="contained" color="secondary" onClick={()=>this.handleOpenBtn(row)}>打开</Button>
                               &emsp;
                               <Button variant="contained" color="error" onClick={()=>{this.handleDeleteBtn(row)}}>删除</Button></div> : <Skeleton variant="rectangular"  height={32} />}
                           </TableCell>
@@ -177,5 +255,41 @@ class Saving extends Component {
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        updateCode: state.UpdateCode,
+        codeText: state.CodeContent,
+        language: state.Language,
+        fileName: state.OpenedCodeName
+    }
+}
+
+const mapDispatchToProps = {
+    openCode: (code) => {
+        return {
+            type: ACTIONS.SETCODE,
+            code
+        }
+    },
+    selectLanguage: (lang)=>{
+        return {
+            type: ACTIONS.SELECT_LANG,
+            lang
+        }
+    },
+    setUpdateCode: (bool) => {
+        return {
+            type: ACTIONS.UPDATECODE,
+            bool
+        }
+    },
+    setOpenCodeStatus: (name) => {
+        return {
+            type: ACTIONS.OPENCODE,
+            name,
+        }
+    }
+}
  
-export default Saving;
+export default connect(mapStateToProps, mapDispatchToProps)( Saving );

@@ -4,15 +4,15 @@ import { Component } from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
 
 import {ThemeProvider} from '@emotion/react';
-import {Container} from '@mui/material'
 
 import CodeArea from './content/CodeArea';
+import Footer from './content/Footer';
 import NotFound from './content/NotFound';
 import Saving from './content/Saving';
 import Setting from './content/Setting';
 import Login from './content/Login';
 import Register from './content/Register';
-import PersistentDrawerRight from './DrawRight.jsx'
+import PersistentDrawerLeft from './DrawerLeft.jsx'
 
 import myTheme from './myTheme.js';
 
@@ -44,7 +44,7 @@ class App extends Component {
     render() { 
         return ( 
             <ThemeProvider theme={myTheme}>
-                <PersistentDrawerRight>
+                <PersistentDrawerLeft>
                     <Routes>
                         <Route path='/' element={<CodeArea />} />
                         <Route path='/Coding' element={<Navigate replace to='/'/>}  />
@@ -55,10 +55,8 @@ class App extends Component {
                         <Route path='/404' element={<NotFound />}  />
                         <Route path='*' element={<Navigate replace to='/404'/>}  />
                     </Routes>
-                </PersistentDrawerRight>
-                <Container maxWidth="sm">
-                    <footer>No Licensed | Copyright © 2022-present <a href='https://github.com/mosqu1t0'>mosquito</a></footer>
-                </Container>
+                    <Footer />
+                </PersistentDrawerLeft>
             </ThemeProvider>
         );
     }

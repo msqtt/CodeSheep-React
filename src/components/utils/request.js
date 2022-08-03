@@ -37,19 +37,6 @@ export function DELETE(url, params, headers) {
 }
 
 
-export function OPTIONS(url, params, headers) {
-    return new Promise((resolve, reject) => {
-        axios.options(url, {...params}, {...headers})
-            .then(response => {
-                resolve(response.data);
-            })
-            .catch(error => {
-                reject(error.data);
-            })
-    })
-}
-
-
 export function PUT(url, params, headers) {
     return new Promise((resolve, reject) => {
         axios.put(url, {...params}, {...headers})

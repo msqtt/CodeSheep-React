@@ -1,7 +1,9 @@
 const ACTIONS = {
     SELECT_LANG: 'select_lang',
-    SAVECODE: 'save_code',
+    SETCODE: 'set_code',
     SETLOGIN: 'set_login',
+    UPDATECODE: 'update_code',
+    OPENCODE: 'open_code'
 }
 
 export default ACTIONS;
