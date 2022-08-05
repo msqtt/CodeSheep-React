@@ -37,7 +37,8 @@ class Saving extends Component {
         rows: [
           createData('ready1', '???', 0, null, null),
           createData('ready2', '???', 0, null, null),
-          createData('ready3', '???', 0, null, null), createData('ready4', '???', 0, null, null),
+          createData('ready3', '???', 0, null, null),
+          createData('ready4', '???', 0, null, null),
           createData('ready5', '???', 0, null, null),
           createData('ready6', '???', 0, null, null),
         ]
@@ -116,6 +117,7 @@ class Saving extends Component {
 
     handleOpenBtn = async (row) => {
         if (this.props.updateCode || this.props.codeText !== ''){
+            console.log(this.props.language)
             if (this.props.updateCode && this.props.language === row.language && this.props.fileName === row.fileName){
                 this.handleSnackMsg(0, '该代码已经打开了喔 (´･д･｀)');
                 return;
@@ -134,7 +136,7 @@ class Saving extends Component {
                     this.props.openCode(data.content);
                     this.props.selectLanguage(language);
                     this.props.setUpdateCode(true);
-                    this.props.setOpenCodeStatus(row.fileName);
+                    this.props.setOpenCodeStatus(fileName, language);
                     this.setState({navigate: true});
                 }
             }
@@ -154,7 +156,7 @@ class Saving extends Component {
                 this.props.openCode(data.content);
                 this.props.selectLanguage(language);
                 this.props.setUpdateCode(true);
-                this.props.setOpenCodeStatus(fileName);
+                this.props.setOpenCodeStatus(fileName, language);
                 this.setState({navigate: true});
             } else {
                 this.setState({openWindow: false});
@@ -238,9 +240,9 @@ class Saving extends Component {
                           <TableCell align="left">{this.state.loadCode ? row.time : (<Skeleton variant="text"  height={32}/>)}</TableCell>
 
                           <TableCell align="right">
-                          {this.state.loadCode ? <div><Button variant="contained" color="secondary" onClick={()=>this.handleOpenBtn(row)}>打开</Button>
+                          {this.state.loadCode ? <div><Button variant="contained" color="secondary" onClick={()=>this.handleOpenBtn(row)}>Open</Button>
                               &emsp;
-                              <Button variant="contained" color="error" onClick={()=>{this.handleDeleteBtn(row)}}>删除</Button></div> : <Skeleton variant="rectangular"  height={32} />}
+                              <Button variant="contained" color="error" onClick={()=>{this.handleDeleteBtn(row)}}>drop</Button></div> : <Skeleton variant="rectangular"  height={32} />}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -260,7 +262,7 @@ const mapStateToProps = (state) => {
     return {
         updateCode: state.UpdateCode,
         codeText: state.CodeContent,
-        language: state.Language,
+        language: state.OpenedCodeType,
         fileName: state.OpenedCodeName
     }
 }
@@ -284,10 +286,11 @@ const mapDispatchToProps = {
             bool
         }
     },
-    setOpenCodeStatus: (name) => {
+    setOpenCodeStatus: (name, lang) => {
         return {
             type: ACTIONS.OPENCODE,
             name,
+            lang
         }
     }
 }

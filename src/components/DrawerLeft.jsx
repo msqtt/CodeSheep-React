@@ -29,6 +29,7 @@ import { useSelector, useDispatch} from 'react-redux';
 
 
 import ACTIONS from './redux/aciton';
+import { basicConfig } from './utils/config';
 
 
 const drawerWidth = 240;
@@ -96,8 +97,19 @@ export default function PersistentDrawerLeft(props) {
   const handleLogout = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('time');
+    localStorage.removeItem('user-config');
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     dispatch({type: ACTIONS.SETLOGIN, bool: false});
+
+    let configJson = localStorage.getItem('config');
+    if (configJson !== null && configJson !== ''){
+        let config = JSON.parse(configJson);
+        dispatch({type: ACTIONS.SETEXTENDS, ...config.extends});
+        dispatch({type: ACTIONS.SETBASIC, config: config.basic});
+    } else {
+        dispatch({type: ACTIONS.SETEXTENDS, vim: false, line: true, theme: 'githubLight'});
+        dispatch({type: ACTIONS.SETBASIC, config: basicConfig});
+    }
   }
 
   const checkLoginText = (text) => {

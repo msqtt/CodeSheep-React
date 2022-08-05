@@ -1,4 +1,5 @@
 import ACTIONS from './aciton';
+import { basicConfig } from '../utils/config';
 
 const reducer = (state={
     Language: 'cpp',
@@ -6,6 +7,13 @@ const reducer = (state={
     LoginStatus: false,
     UpdateCode: false,
     OpenedCodeName: '',
+    OpenedCodeType: '',
+    VimMode: false,
+    IoLineNumber: true,
+    Theme: 'githubLight',
+    BasicConfig: {
+        ...basicConfig
+    }
 }, action) => {
     switch(action.type){
         case ACTIONS.SELECT_LANG: 
@@ -27,11 +35,24 @@ const reducer = (state={
             return {
                 ...state,
                 OpenedCodeName: action.name,
+                OpenedCodeType: action.lang,
             }
         case ACTIONS.SETLOGIN: 
             return {
                 ...state,
                 LoginStatus: action.bool,
+            }
+        case ACTIONS.SETEXTENDS: 
+            return {
+                ...state,
+                VimMode: action.vim,
+                IoLineNumber: action.line,
+                Theme: action.theme
+            }
+        case ACTIONS.SETBASIC: 
+            return {
+                ...state,
+                BasicConfig: action.config
             }
         default: 
             return state;

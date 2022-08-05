@@ -9,10 +9,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import TextField from '@mui/material/TextField';
 import CodeMirror from '@uiw/react-codemirror';
-import {githubLight} from '@uiw/codemirror-theme-github';
-import {cpp} from '@codemirror/lang-cpp';
-import {python} from '@codemirror/lang-python';
-import {javascript} from '@codemirror/lang-javascript';
 
 import { connect } from 'react-redux';
 
@@ -22,29 +18,10 @@ import ScrollTop from './ScrollTop';
 
 import ACTIONS from '../redux/aciton.js';
 import {POST, PUT} from '../utils/request';
+import {getExtensions, themeList} from '../utils/config';
 
 
 
-
-
-
-const LangFuntion = {
-    cpp,
-    python,
-    javascript,
-}
-
-const getLangExtend = (extend, lang)=>{
-    if (extend === null)
-        return [
-            Reflect.apply(LangFuntion[lang], null, []),
-        ]
-    else 
-        return [
-            ...extend,
-            Reflect.apply(LangFuntion[lang], null, []),
-        ]
-}
 
 class CodeArea extends Component {
     state = {
@@ -114,7 +91,7 @@ class CodeArea extends Component {
             }
 
         } else {
-            clearTimeout(this.state.timeOutId);
+            if (this.state.timeOutId !== '') clearTimeout(this.state.timeOutId);
             this.handleSnackMsg(0, '操作太频繁啦，请３ｓ后重试！（´(ｪ)｀）');
             this.state.timeOutId = setTimeout(() => {
                 this.state.clickAble = true;
@@ -123,6 +100,11 @@ class CodeArea extends Component {
     }
 
     handleSave = () => {
+        if (this.props.codeText === ''){
+            this.handleSnackMsg(0, '啥都没写呢，你存啥 U￣ｰ￣U');
+            return;
+        }
+
         let updateCode = this.props.updateCode;
 
         if (updateCode){
@@ -148,10 +130,6 @@ class CodeArea extends Component {
     handleSaveConfirm = async () => {
         let fileName = this.filename.current.value;
 
-        if (this.props.codeText === ''){
-            this.handleSnackMsg(0, '啥都没写呢，你存啥 U￣ｰ￣U');
-            return;
-        }
 
         if (fileName === ''){
             this.handleSnackMsg(0, '文件名不能为空 U￣ｰ￣U');
@@ -173,7 +151,7 @@ class CodeArea extends Component {
             this.handleSnackMsg(data.code, data.msg);
 
             if (data.code === 200){
-                this.props.setOpenCodeStatus(fileName);
+                this.props.setOpenCodeStatus(fileName, this.props.lang);
                 this.props.setUpdateCode(true);
                 this.setState({saveWindow: false});
             }
@@ -189,10 +167,16 @@ class CodeArea extends Component {
     }
 
     handleUpdateCode = async () => {
-        let language = this.props.lang;
         let fileName = this.props.openedCodeName;
+        let language = this.props.openedCodeType;
+        let selectLanguage = this.props.lang;
         let code = this.props.codeText;
-        
+
+        if (language !== selectLanguage){
+            this.handleSnackMsg(0, '你改变了语言喔，请保存为新文件 （´(ｪ)｀）');
+            return;
+        }
+
         let data = await PUT('api/code', {
             language,
             fileName,
@@ -259,11 +243,12 @@ class CodeArea extends Component {
                             value={this.props.codeText}
                             minHeight='400px'
                             height='auto' 
-                            theme={githubLight} 
-                            extensions={getLangExtend(null, this.props.lang)} 
+                            theme={themeList[this.props.theme]} 
+                            extensions={getExtensions(this.props.vim, this.props.lang)} 
                             placeholder='(๑・∀・ฅ✧ Code here'
-                            onChange={e=>{ this.state.codeContent = e }}
+                            onChange={v=>{ this.state.codeContent = v ;}}
                             onBlur={this.handleBlur}
+                            basicSetup={this.props.basicSetup}
                         />
                     </Card>
 
@@ -293,12 +278,18 @@ class CodeArea extends Component {
                         <CodeMirror
                             minHeight='100px' 
                             height='auto'
-                            theme={githubLight} 
+                            theme={themeList[this.props.theme]} 
                             placeholder='(´-ωก`) Input...'
                             basicSetup={
                                 {
                                     highlightActiveLine: false,
                                     highlightActiveLineGutter: false,
+                                    foldGutter: false,
+                                    bracketMatching: false,
+                                    autocompletion: false,
+                                    allowMultipleSelections: false,
+                                    closeBrackets: false,
+                                    lineNumbers: this.props.lineNum
                                 }
                             }
                             onChange={(e)=>{this.state.inputContent = e;}}
@@ -309,13 +300,19 @@ class CodeArea extends Component {
                             value={this.state.outputContent}
                             minHeight='100px' 
                             height='auto'
-                            theme={githubLight} 
+                            theme={themeList[this.props.theme]} 
                             placeholder='ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!'
                             editable={ false }
                             basicSetup={
                                 {
                                     highlightActiveLine: false,
                                     highlightActiveLineGutter: false,
+                                    foldGutter: false,
+                                    bracketMatching: false,
+                                    autocompletion: false,
+                                    allowMultipleSelections: false,
+                                    closeBrackets: false,
+                                    lineNumbers: this.props.lineNum
                                 }
                             }
                         />
@@ -333,6 +330,11 @@ const mapStateToProps = (state) => {
         loginStatus: state.LoginStatus,
         updateCode: state.UpdateCode,
         openedCodeName: state.OpenedCodeName,
+        openedCodeType: state.OpenedCodeType,
+        theme: state.Theme,
+        vim: state.VimMode,
+        lineNum: state.IoLineNumber,
+        basicSetup: state.BasicConfig
     }
 }
 
@@ -349,10 +351,11 @@ const mapDispatchToProps = {
             bool
         }
     },
-    setOpenCodeStatus: (name) => {
+    setOpenCodeStatus: (name, lang) => {
         return {
             type: ACTIONS.OPENCODE,
             name,
+            lang,
         }
     }
 }

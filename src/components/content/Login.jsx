@@ -75,6 +75,9 @@ class Login extends Component {
 
                 localStorage.setItem("email", email);
                 localStorage.setItem("time", date);
+                if (data.config !== undefined)
+                    localStorage.setItem("user-config", data.config);
+
                 setTimeout(()=>{window.location.href='/';}, 1000);
             }
         } else {

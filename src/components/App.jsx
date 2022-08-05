@@ -14,17 +14,22 @@ import Login from './content/Login';
 import Register from './content/Register';
 import PersistentDrawerLeft from './DrawerLeft.jsx'
 
-import myTheme from './myTheme.js';
+import myTheme from './utils/myTheme';
 
 import { connect } from 'react-redux';
 import ACTIONS from './redux/aciton';
+import { printLOGO } from  './utils/printLogo';
 
 class App extends Component {
-    state = {  }
+    state = { 
+    }
 
     componentDidMount(){
-        let email = localStorage.getItem("email");
-        let time = localStorage.getItem("time");
+
+        printLOGO();
+
+        let email = localStorage.getItem('email');
+        let time = localStorage.getItem('time');
 
         if (time !== null && time !== '' && email !== null && email !== ''){
             if (Date.parse(time) < Date.parse(new Date())){
@@ -34,9 +39,24 @@ class App extends Component {
                 this.props.setLogin(false);
             } else {
                 this.props.setLogin(true);
+
+                let userConfigJson = localStorage.getItem('user-config');
+                if (userConfigJson !== null && userConfigJson !== ''){
+                    let userConfig = JSON.parse(userConfigJson);
+                    console.log(userConfigJson.length);
+                    this.props.setBasicSetup(userConfig.basic);
+                    this.props.setExtends(userConfig.extends);
+                }
             }
         } else {
             this.props.setLogin(false);
+
+            let configJson = localStorage.getItem('config');
+            if (configJson !== null && configJson !== ''){
+                let config = JSON.parse(configJson);
+                this.props.setBasicSetup(config.basic);
+                this.props.setExtends(config.extends);
+            }
         }
 
     }
@@ -73,6 +93,20 @@ const mapDispatchToProps = {
         return {
             type: ACTIONS.SETLOGIN,
             bool, 
+        }
+    },
+    setExtends: (extend) => {
+        return {
+            type: ACTIONS.SETEXTENDS,
+            vim: extend.vim,
+            line: extend.line,
+            theme: extend.theme
+        }
+    },
+    setBasicSetup: (config) => {
+        return {
+            type: ACTIONS.SETBASIC,
+            config
         }
     }
 }
