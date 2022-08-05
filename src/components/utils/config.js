@@ -11,6 +11,7 @@ import { duotoneLight, duotoneDark } from '@uiw/codemirror-theme-duotone';
 import { eclipse } from '@uiw/codemirror-theme-eclipse';
 import {githubLight, githubDark} from '@uiw/codemirror-theme-github';
 import { xcodeLight, xcodeDark} from '@uiw/codemirror-theme-xcode';
+import { sakura } from './sakura';
 
 
 
@@ -45,6 +46,7 @@ export const themeList = {
     eclipse,
     githubLight,
     githubDark,
+    sakura,
     xcodeLight,
     xcodeDark,
 }
