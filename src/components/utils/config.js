@@ -1,8 +1,9 @@
+import { StreamLanguage } from '@codemirror/language';
+import {go} from '@codemirror/legacy-modes/mode/go'
 import {cpp} from '@codemirror/lang-cpp';
 import {python} from '@codemirror/lang-python';
 import {javascript} from '@codemirror/lang-javascript';
 import { vim } from "@replit/codemirror-vim";
-
 import { abcdef } from '@uiw/codemirror-theme-abcdef';
 import { atomone } from '@uiw/codemirror-theme-atomone';
 import { androidstudio } from '@uiw/codemirror-theme-androidstudio';
@@ -14,8 +15,13 @@ import { xcodeLight, xcodeDark} from '@uiw/codemirror-theme-xcode';
 import { sakura } from './sakura';
 
 
+export function golang() {
+    return StreamLanguage.define(go);
+}
 
 const LangFuntionMap = {
+    c: cpp,
+    golang,
     cpp,
     python,
     javascript,

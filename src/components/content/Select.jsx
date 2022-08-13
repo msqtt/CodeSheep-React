@@ -24,9 +24,11 @@ export default function SelectAutoWidth() {
           label="lang"
           sx={{height: '2.5rem'}}
         > 
+          <MenuItem value={'c'}>c</MenuItem>
           <MenuItem value={'cpp'}>
-            <em>c/cpp</em>
+            <em>cpp</em>
           </MenuItem>
+          <MenuItem value={'golang'}>golang</MenuItem>
           <MenuItem value={'python'}>python</MenuItem>
           <MenuItem value={'javascript'}>javascript</MenuItem>
         </Select>

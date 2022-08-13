@@ -37,6 +37,18 @@ const Settion = () => {
 
     const dispatch = useDispatch();
 
+    function beforeunload (e) {
+        let confirmationMessage = '你确定离开此页面吗?';
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    }
+
+    React.useEffect(()=>{
+        window.addEventListener('beforeunload', beforeunload);
+        return ()=>{
+            window.removeEventListener('beforeunload', beforeunload);
+        }
+    }, [])
 
     React.useEffect(()=>{
         setBasicSetup({...basicConfigProps});
@@ -132,7 +144,7 @@ const Settion = () => {
                 Settion 
             </Typography>
                 <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={snackBarOpen}
                     onClose={handleSnackClose}
                     autoHideDuration={3000}

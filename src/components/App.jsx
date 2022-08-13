@@ -24,9 +24,14 @@ class App extends Component {
     state = { 
     }
 
+
     componentDidMount(){
 
         printLOGO();
+
+
+
+
 
         let email = localStorage.getItem('email');
         let time = localStorage.getItem('time');
@@ -43,7 +48,6 @@ class App extends Component {
                 let userConfigJson = localStorage.getItem('user-config');
                 if (userConfigJson !== null && userConfigJson !== ''){
                     let userConfig = JSON.parse(userConfigJson);
-                    console.log(userConfigJson.length);
                     this.props.setBasicSetup(userConfig.basic);
                     this.props.setExtends(userConfig.extends);
                 }
@@ -58,7 +62,6 @@ class App extends Component {
                 this.props.setExtends(config.extends);
             }
         }
-
     }
 
     render() { 

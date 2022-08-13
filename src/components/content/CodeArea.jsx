@@ -39,6 +39,18 @@ class CodeArea extends Component {
         updateWindow: false,
     }
 
+    beforeunload (e) {
+        let confirmationMessage = '你确定离开此页面吗?';
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    }
+
+    componentDidMount() {
+        window.addEventListener('beforeunload', this.beforeunload);
+    }
+    componentWillUnmount () {
+        window.removeEventListener('beforeunload', this.beforeunload);
+    }
     constructor(props){
         super(props);
         this.filename = React.createRef();
@@ -263,7 +275,7 @@ class CodeArea extends Component {
                     </Fab>
 
                     <Snackbar
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                         open={this.state.snackBarOpen}
                         onClose={this.handleSnackClose}
                         autoHideDuration={3000}

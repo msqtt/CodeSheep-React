@@ -44,8 +44,20 @@ class Saving extends Component {
         ]
     }
 
+    beforeunload (e) {
+        let confirmationMessage = '你确定离开此页面吗?';
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    }
+
+    componentWillUnmount () {
+        window.removeEventListener('beforeunload', this.beforeunload);
+    }
 
     componentDidMount = async () => {
+
+        window.addEventListener('beforeunload', this.beforeunload);
+
         let pageNum = this.state.pageNum;
         let data = await GET(`/api/codes/5/${pageNum}`, null, null)
 
@@ -174,7 +186,7 @@ class Saving extends Component {
             </Typography>
 
             <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={this.state.snackBarOpen}
                 onClose={this.handleSnackClose}
                 autoHideDuration={3000}
