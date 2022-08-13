@@ -161,7 +161,7 @@ class Register extends Component {
                     </Box>
 
                     <Snackbar
-                        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                         open={this.state.snackBarOpen}
                         onClose={this.handleSnackClose}
                         autoHideDuration={3000}
