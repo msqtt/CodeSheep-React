@@ -15,7 +15,7 @@ code {
     margin: 0, auto;
 }
 
-#headLine {
+.headLine {
     display: flex;   
     justify-content: space-between;
     align-items: center;

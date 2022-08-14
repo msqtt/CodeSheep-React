@@ -19,10 +19,10 @@ export function golang() {
     return StreamLanguage.define(go);
 }
 
-const LangFuntionMap = {
+export const LangFuntionMap = {
     c: cpp,
-    golang,
     cpp,
+    golang,
     python,
     javascript,
 }

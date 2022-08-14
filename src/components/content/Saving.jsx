@@ -5,19 +5,24 @@ import { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Card, Button, Typography } from '@mui/material';
 import { Box, Skeleton, Pagination, Snackbar, Alert } from '@mui/material';
 import { Dialog, DialogTitle, DialogContent, DialogContentText } from '@mui/material';
+import { TextField, Tooltip } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
+import {Navigate} from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import ACTIONS from '../redux/aciton';
 import { GET, DELETE } from '../utils/request';
-import {Navigate} from 'react-router-dom';
+
+import SaveSelect from './SaveSelect';
+
+
+
+
 
 const createData = (fileName, language, time, code, input) => {
   return { fileName, language, time, code, input};
 }
-
-
-
 class Saving extends Component {
 
 
@@ -33,7 +38,13 @@ class Saving extends Component {
         snackBarOpen: false,
         statusType: 'success',
         navigate: false,
-
+        searchLang: '',
+        searchText: '',
+        pageLang: '',
+        pageText: '',
+        fileNameError: false,
+        clickAble: true,
+        timeOutId: '',
         rows: [
           createData('ready1', '???', 0, null, null),
           createData('ready2', '???', 0, null, null),
@@ -55,11 +66,10 @@ class Saving extends Component {
     }
 
     componentDidMount = async () => {
-
         window.addEventListener('beforeunload', this.beforeunload);
 
         let pageNum = this.state.pageNum;
-        let data = await GET(`/api/codes/5/${pageNum}`, null, null)
+        let data = await GET(`/api/codes/5/${pageNum}?language=&&fileName=`, null, null)
 
         if (data !== null){
             let rows = data.list.map(code =>{
@@ -76,16 +86,25 @@ class Saving extends Component {
     }
 
     handleChangePage = async (event, value) => {
-        let data = await GET(`/api/codes/5/${value}`, null, null)
+        let language = this.state.pageLang;
+        let fileName = this.state.pageText;
 
+
+        let data = await GET(`/api/codes/5/${value}?language=${language}&&fileName=${fileName}`, null, null);
         if (data !== null){
-
             let rows = data.list.map(code =>{
                 code.time = code.time.replace('T', ' ');
                 return code;
             });
 
+            if (data.size === 0 && value !== 1) {
+                this.handleChangePage(null, value - 1)
+                return 
+            }
             this.setState({pageSize: data.pages, rows, pageNum: value});
+            return
+        } else {
+            this.handleSnackMsg(400, '出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）');
         }
     }
 
@@ -97,7 +116,7 @@ class Saving extends Component {
         let statusType = '';
         if (type === 0) statusType = 'info';
         if (type === 200) statusType = 'success';
-        if (type ===  300) statusType = 'warning';
+        if (type === 300) statusType = 'warning';
         if (type === 400) statusType = 'error';
         this.setState({statusType, resMsg: msg, snackBarOpen: true});
     }
@@ -176,15 +195,75 @@ class Saving extends Component {
         }
     }
 
+    handleSearchLang = (lang) => {
+        this.state.searchLang = lang
+    }
+
+    handleSearchText = (e) => {
+        let value = e.target.value
+        this.state.searchText = value
+
+        let fileNameReg = /^\w{1,125}$/;
+        if (value !== '' && !fileNameReg.test(value)) {
+            if (!this.state.fileNameError) this.setState({fileNameError: true});
+        } else {
+            if (this.state.fileNameError) this.setState({fileNameError: false});
+        }
+    }
+
+    handleSearchBtn = async () => {
+        let language = this.state.searchLang;
+        let fileName = this.state.searchText;
+        this.state.pageLang = language;
+        this.state.pageText = fileName;
+
+        if (this.state.clickAble) {
+
+            this.state.clickAble = false
+
+            this.state.timeOutId = setTimeout(() => {
+                this.state.clickAble = true;
+            }, 1000);
+
+            if (this.state.fileNameError) {
+                this.handleSnackMsg(0, "文件名不合法 (´･д･｀)");
+                return
+            }
+            let data = await GET(`/api/codes/5/1?language=${language}&&fileName=${fileName}`, null, null)
+            if (data !== null){
+                let rows = data.list.map(code =>{
+                    code.time = code.time.replace('T', ' ');
+                    return code;
+                });
+                this.setState({pageSize: data.pages, rows, pageNum: 1});
+            }
+        } else {
+            if (this.state.timeOutId !== '') clearTimeout(this.state.timeOutId);
+            this.handleSnackMsg(0, '操作太频繁啦，请1ｓ后重试！（´(ｪ)｀）');
+            this.state.timeOutId = setTimeout(() => {
+                this.state.clickAble = true;
+            }, 1000);
+        }
+    }
+
     render() { 
         return ( 
             <React.Fragment>
-            {this.state.navigate && <Navigate to='/'></Navigate>}
-            <header style={{marginTop: `calc(3rem + 4px)`}}></header>
-            <Typography sx={{marginBottom: '12px'}} variant="h5" gutterBottom component="div">
-                Saving 
-            </Typography>
+            <div className='headLine'>
+                <Typography sx={{marginBottom: 0}} variant="h5" gutterBottom component="div">
+                    Saving 
+                </Typography>
+                <div style={{display: 'flex', alignItems: 'center'}}>
 
+                    <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
+                        <TextField error={this.state.fileNameError} onChange={this.handleSearchText} id="standard-basic" sx={{ marginRight: '1rem' }} label="FileName" variant="standard" />
+                    </Tooltip>
+                    <SaveSelect setPropsLang={this.handleSearchLang} />
+                    <Button onClick={this.handleSearchBtn} variant="contained" color='secondary' style={{height: '2.5rem', margin: '0 1.25rem 0 1rem'}} ><SearchIcon/></Button>
+                </div>
+            </div>
+
+            {this.state.navigate && <Navigate to='/'></Navigate>}
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 open={this.state.snackBarOpen}
@@ -263,7 +342,7 @@ class Saving extends Component {
                 </TableContainer>
             </Card>
             <Box sx={{display: 'flex', justifyContent: 'center', margin: '2rem 0'}}>
-              <Pagination count={this.state.pageSize} color="secondary" size='large' onChange={this.handleChangePage}/>
+              <Pagination page={this.state.pageNum} count={this.state.pageSize} color="secondary" size='large' onChange={this.handleChangePage}/>
             </Box>
             </React.Fragment>
         );

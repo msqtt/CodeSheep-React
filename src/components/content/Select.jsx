@@ -5,6 +5,7 @@ import { InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 
 import ACTIONS from '../redux/aciton';
+import {LangFuntionMap} from '../utils/config';
 
 
 export default function SelectAutoWidth() {
@@ -24,13 +25,7 @@ export default function SelectAutoWidth() {
           label="lang"
           sx={{height: '2.5rem'}}
         > 
-          <MenuItem value={'c'}>c</MenuItem>
-          <MenuItem value={'cpp'}>
-            <em>cpp</em>
-          </MenuItem>
-          <MenuItem value={'golang'}>golang</MenuItem>
-          <MenuItem value={'python'}>python</MenuItem>
-          <MenuItem value={'javascript'}>javascript</MenuItem>
+          {Object.keys(LangFuntionMap).map(idx => (<MenuItem key={idx} value={idx}>{idx == 'cpp' ? <em>cpp</em> : idx}</MenuItem>))}
         </Select>
       </FormControl>
   );

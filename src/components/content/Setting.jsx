@@ -71,6 +71,13 @@ const Settion = () => {
     const handleSaveConfig = async () => {
         if (clickAble){
             setClickAble(false);
+
+
+            let id = setTimeout(() => {
+                setClickAble(true);
+            }, 3000);
+            setTimeOutId(id);
+
             dispatch({
                 type: ACTIONS.SETEXTENDS,
                 vim: vimCheck,

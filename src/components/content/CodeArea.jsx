@@ -101,7 +101,6 @@ class CodeArea extends Component {
                 this.handleSnackMsg(0, '啥都没写呢，你跑啥 （´(ｪ)｀）');
                 this.setState({waitCode: false});
             }
-
         } else {
             if (this.state.timeOutId !== '') clearTimeout(this.state.timeOutId);
             this.handleSnackMsg(0, '操作太频繁啦，请３ｓ后重试！（´(ｪ)｀）');
@@ -126,7 +125,7 @@ class CodeArea extends Component {
         }
     }
 
-    handleFileNameVaild = (e) => {
+    handleFileNameValid = (e) => {
         let fileName = e.target.value;
         let fileNameReg = /^\w{1,125}$/;
 
@@ -208,7 +207,7 @@ class CodeArea extends Component {
         return ( 
             <React.Fragment>
                 <div id='Code'>
-                    <div id='headLine'>
+                    <div className='headLine'>
                         <Typography id='back-to-top-anchor' sx={{marginBottom: 0}} variant="h5" gutterBottom component="div">
                             Coding 
                         </Typography>
@@ -237,7 +236,7 @@ class CodeArea extends Component {
                         <DialogTitle>Saving</DialogTitle>
                         <DialogContent>
                         <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
-                            <TextField inputRef={this.filename} error={this.state.fileNameError} onChange={this.handleFileNameVaild} id="outlined-basic" sx={{marginTop: '6px'}} label="FileName" variant="outlined" />
+                            <TextField inputRef={this.filename} error={this.state.fileNameError} onChange={this.handleFileNameValid} id="outlined-basic" sx={{marginTop: '6px'}} label="FileName" variant="outlined" />
                         </Tooltip>
                             <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '2rem'}}>
                                 <Button onClick={this.handleSaveConfirm} sx={{width: '45%', height: '3rem'}} variant="contained" color="secondary">
