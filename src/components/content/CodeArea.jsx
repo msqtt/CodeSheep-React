@@ -236,7 +236,7 @@ class CodeArea extends Component {
                         <DialogTitle>Saving</DialogTitle>
                         <DialogContent>
                         <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
-                            <TextField inputRef={this.filename} error={this.state.fileNameError} onChange={this.handleFileNameValid} id="outlined-basic" sx={{marginTop: '6px'}} label="FileName" variant="outlined" />
+                            <TextField autoComplete='off' inputRef={this.filename} error={this.state.fileNameError} onChange={this.handleFileNameValid} id="outlined-basic" sx={{marginTop: '6px'}} label="FileName" variant="outlined" />
                         </Tooltip>
                             <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '2rem'}}>
                                 <Button onClick={this.handleSaveConfirm} sx={{width: '45%', height: '3rem'}} variant="contained" color="secondary">

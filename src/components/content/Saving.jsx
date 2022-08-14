@@ -256,7 +256,7 @@ class Saving extends Component {
                 <div style={{display: 'flex', alignItems: 'center'}}>
 
                     <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
-                        <TextField error={this.state.fileNameError} onChange={this.handleSearchText} id="standard-basic" sx={{ marginRight: '1rem' }} label="FileName" variant="standard" />
+                        <TextField autoComplete='off' error={this.state.fileNameError} onChange={this.handleSearchText} id="standard-basic" sx={{ marginRight: '1rem' }} label="FileName" variant="standard" />
                     </Tooltip>
                     <SaveSelect setPropsLang={this.handleSearchLang} />
                     <Button onClick={this.handleSearchBtn} variant="contained" color='secondary' style={{height: '2.5rem', margin: '0 1.25rem 0 1rem'}} ><SearchIcon/></Button>

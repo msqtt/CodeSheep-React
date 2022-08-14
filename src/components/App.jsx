@@ -12,6 +12,7 @@ import Saving from './content/Saving';
 import Setting from './content/Setting';
 import Login from './content/Login';
 import Register from './content/Register';
+import About from './content/About';
 import PersistentDrawerLeft from './DrawerLeft.jsx'
 
 import myTheme from './utils/myTheme';
@@ -19,6 +20,7 @@ import myTheme from './utils/myTheme';
 import { connect } from 'react-redux';
 import ACTIONS from './redux/aciton';
 import { printLOGO } from  './utils/printLogo';
+import { yep } from './utils/yepyep';
 
 class App extends Component {
     state = { 
@@ -26,12 +28,8 @@ class App extends Component {
 
 
     componentDidMount(){
-
         printLOGO();
-
-
-
-
+        yep();
 
         let email = localStorage.getItem('email');
         let time = localStorage.getItem('time');
@@ -75,6 +73,7 @@ class App extends Component {
                         <Route path='/Setting' element={<Setting />}  />
                         <Route path='/Login' element={!this.props.loginStatus ? <Login /> : <Navigate replace to='/' />}  />
                         <Route path='/Register' element={!this.props.loginStatus ? <Register /> : <Navigate replace to='/' />}  />
+                        <Route path='/About' element={<About />}  />
                         <Route path='/404' element={<NotFound />}  />
                         <Route path='*' element={<Navigate replace to='/404'/>}  />
                     </Routes>

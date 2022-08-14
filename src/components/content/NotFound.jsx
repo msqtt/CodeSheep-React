@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 
 
 class NotFound extends Component {
-    state = {  }
     render() { 
         return ( 
             <React.Fragment>
@@ -15,7 +14,7 @@ class NotFound extends Component {
                         404
                     </Typography>
                     <Typography color='primary' variant="h5" component="div" gutterBottom>
-                        <em>Oops, 没有更多内容啦！</em>
+                        <em>Oops, 没有更多内容啦！ ∑(￣□￣)</em>
                     </Typography>
                 </div>
             </React.Fragment>

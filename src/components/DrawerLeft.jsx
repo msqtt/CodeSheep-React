@@ -24,6 +24,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
+import InfoIcon from '@mui/icons-material/Info';
 import {useNavigate} from 'react-router-dom';
 import { useSelector, useDispatch} from 'react-redux';
 
@@ -117,14 +118,14 @@ export default function PersistentDrawerLeft(props) {
         let email = localStorage.getItem('email');
         if (text === 'Login') return email;
         if (text === 'Register') return 'Logout';
-    } else {
-        return text
     }
+    return text
   }
 
   const loginFunction = (text) => {
     if (text === 'Login') return ()=>{navigator('/Setting')};
-    else return handleLogout;
+    else if (text === 'About') return ()=>{navigator('/About')}
+    return handleLogout;
   }
 
   return (
@@ -183,12 +184,13 @@ export default function PersistentDrawerLeft(props) {
         <Divider />
         <List>
 
-          {['Login', 'Register'].map((text, index) => (
+          {['Login', 'Register', 'About'].map((text, index) => (
             <ListItem key={text} disablePadding>
               <ListItemButton onClick={!loginStatus ?  ()=>{navigator(`/${text}`)} : loginFunction(text)}>
                 <ListItemIcon>
                     {index === 0 && ( !loginStatus ? <LoginIcon /> : <PersonIcon /> )}
                     {index === 1 && ( !loginStatus ? <ArrowUpwardIcon /> : <LogoutIcon /> )}
+                    {index === 2 && (<InfoIcon />)}
                 </ListItemIcon>
                 <ListItemText primary={checkLoginText(text)} />
               </ListItemButton>
