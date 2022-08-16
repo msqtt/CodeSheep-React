@@ -53,7 +53,7 @@ function About() {
                 (๑•̀ㅁ•́ฅ✧ 
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Hi, 我是开发者 mosquito: <br/>&emsp;本站是个十分轻量的在线ide，基本上只是为了我个人方便使用而存在的，当然十分欢迎你的光临！但是由于个人的技术和财力不足(说不定明天就关闭了)，网站还存在许多许多许多不足，希望你能海涵，善待本站，多谢了。(・∀・)
+                Hi, 我是开发者 <a className='perfectA' href='https://github.com/mosqu1t0'>mosquito</a>: <br/>&emsp;本站是个十分轻量的在线ide，基本上只是为了我个人方便使用而存在的，当然十分欢迎你的光临！但是由于个人的技术和财力不足(说不定明天就关闭了)，网站还存在许多许多许多不足，希望你能海涵，善待本站，多谢了。(・∀・)
                 <br/>&emsp;<b>为了你的数据安全，还请不要把重要或敏感的信息以任何方式存储在本站，倘若丢失后果自负喔。</b>
               </Typography>
             </CardContent>
