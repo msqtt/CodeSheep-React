@@ -19,28 +19,39 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x, 16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v3
     
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
+        node-version: 16.16.0
+
+    - name: Cache
+      uses: actions/cache@v3.0.7
+      env:
+          cache-name: cache-node-modules
+      with:
+          path: ./node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package.json') }} 
+          restore-keys: |
+              ${{ runner.os }}-build-${{ env.cache-name }}-
+              ${{ runner.os }}-build-
+              ${{ runner.os }}-
+
+      
+    - name: install
+      run: npm i
+    - name: build
+      run: npm run build
     
     - name: Deploy
       uses: easingthemes/ssh-deploy@v2.2.11
       with:
-          SSH_PRIVATE_KEY: ${{ SERVER_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ SERVER_HOST }}
-          REMOTE_USER: ${{ SERVER_HOST }}
+          SSH_PRIVATE_KEY: ${{ env.SERVER_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ env.SERVER_HOST }}
+          REMOTE_USER: ${{ env.SERVER_HOST }}
           SOURCE: 'build/'
           TARGET: '/var/www/html/codesheep'
           ARGS: '-avz --delete'
