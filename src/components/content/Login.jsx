@@ -137,6 +137,7 @@ class Login extends Component {
 
                     <Tooltip title='请输入正确的邮箱'>
                         <TextField
+                            autoComplete='off'
                             error={this.state.emailError}
                             inputRef={this.email}
                             type='email'
