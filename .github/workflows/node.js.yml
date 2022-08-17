@@ -12,6 +12,7 @@ env:
   SERVER_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
   SERVER_USER: ${{ secrets.USERNAME }}
   SERVER_HOST: ${{ secrets.HOST }}}
+  CI: false
     
 
 jobs:
@@ -44,7 +45,7 @@ jobs:
     - name: install
       run: npm i
     - name: build
-      run: yarn build
+      run: npm run build
     
     - name: Deploy
       uses: easingthemes/ssh-deploy@v2.2.11
