@@ -128,6 +128,7 @@ class Register extends Component {
 
                     <Tooltip title='请输入正确的邮箱'>
                         <TextField
+                            autoComplete='off'
                             error={this.state.emailError}
                             type='email'
                             inputRef={this.email}
