@@ -25,7 +25,7 @@ export default function SelectAutoWidth() {
           label="lang"
           sx={{height: '2.5rem'}}
         > 
-          {Object.keys(LangFuntionMap).map(idx => (<MenuItem key={idx} value={idx}>{idx == 'cpp' ? <em>cpp</em> : idx}</MenuItem>))}
+          {Object.keys(LangFuntionMap).map(idx => (<MenuItem key={idx} value={idx}>{idx === 'cpp' ? <em>cpp</em> : idx}</MenuItem>))}
         </Select>
       </FormControl>
   );
