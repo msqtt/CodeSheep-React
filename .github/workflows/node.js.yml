@@ -9,9 +9,9 @@ on:
 
 
 env:
-    SERVER_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-    SERVER_USER: ${{ secrets.USERNAME }}
-    SERVER_HOST: ${{ secrets.HOST }}}
+  SERVER_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+  SERVER_USER: ${{ secrets.USERNAME }}
+  SERVER_HOST: ${{ secrets.HOST }}}
     
 
 jobs:
