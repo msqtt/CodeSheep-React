@@ -15,6 +15,7 @@ const logo = () => {
  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     
                                                                          
 */
+    console.log("what")
 }
 
 export function printLOGO(){
