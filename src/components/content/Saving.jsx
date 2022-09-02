@@ -148,7 +148,6 @@ class Saving extends Component {
 
     handleOpenBtn = async (row) => {
         if (this.props.updateCode || this.props.codeText !== ''){
-            console.log(this.props.language)
             if (this.props.updateCode && this.props.language === row.language && this.props.fileName === row.fileName){
                 this.handleSnackMsg(0, '该代码已经打开了喔 (´･д･｀)');
                 return;

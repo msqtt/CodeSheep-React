@@ -26,10 +26,6 @@ class Register extends Component {
         repasswdError: false,
     }
 
-    handleCheckBox = () => {
-        console.log(true);
-    }
-
     setPasswdError = (flag) => {
         this.setState({passwdError: flag});
     }

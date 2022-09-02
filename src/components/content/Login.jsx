@@ -118,7 +118,6 @@ class Login extends Component {
     }
 
     componentDidMount(){
-        console.log(this.props.codeText);
         if (this.props.codeText !== '')
             this.handleSnackMsg(0, "(｀・ω´・ 登录前请注意保存好代码，本操作会导致代码丢失");
     }
