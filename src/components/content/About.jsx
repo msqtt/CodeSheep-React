@@ -31,7 +31,7 @@ function About() {
     return (
             <React.Fragment>
                 <Snackbar
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open={snackBarOpen}
                     onClose={()=>{setSnackBarOpen(false)}}
                     autoHideDuration={3000}

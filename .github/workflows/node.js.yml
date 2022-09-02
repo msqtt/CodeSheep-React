@@ -51,7 +51,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           SOURCE: 'build/'
-          TARGET: '/var/www/html/codesheep'
+          TARGET: '/root/CodeSheep/nginx/html/codesheep'
           ARGS: '-avz --delete'
     
     
