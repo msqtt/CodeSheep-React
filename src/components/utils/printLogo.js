@@ -1,16 +1,17 @@
-
-
-const logo = 
-`
+const logo = `
  ██████╗ ██████╗ ██████╗ ███████╗███████╗██╗  ██╗███████╗███████╗██████╗ 
 ██╔════╝██╔═══██╗██╔══██╗██╔════╝██╔════╝██║  ██║██╔════╝██╔════╝██╔══██╗
 ██║     ██║   ██║██║  ██║█████╗  ███████╗███████║█████╗  █████╗  ██████╔╝
 ██║     ██║   ██║██║  ██║██╔══╝  ╚════██║██╔══██║██╔══╝  ██╔══╝  ██╔═══╝ 
 ╚██████╗╚██████╔╝██████╔╝███████╗███████║██║  ██║███████╗███████╗██║     
  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     
-`;                                                                         
+`;
 
-export function printLOGO(){
-    console.log(`%c${logo} %cV1.0 Power by fun`, 'color: #2da44e', 'color: #2da44e;font-size: 0.75rem;font-style: italic;');
-    console.log('%c', 'color: #2da44e;font-size: 1rem')
+export function printLOGO() {
+  console.log(
+    `%c${logo} %cV2.0 Power by fun`,
+    "color: #2da44e",
+    "color: #2da44e;font-size: 0.75rem;font-style: italic;"
+  );
+  console.log("%c", "color: #2da44e;font-size: 1rem");
 }
