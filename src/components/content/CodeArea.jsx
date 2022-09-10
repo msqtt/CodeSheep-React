@@ -377,7 +377,7 @@ class CodeArea extends Component {
         <div id="inOut">
           <Card id="inputText" variant="outlined">
             <CodeMirror
-              height="100px"
+              height="120px"
               theme={themeList[this.props.theme]}
               placeholder="(´-ωก`) Input..."
               basicSetup={{
@@ -398,7 +398,7 @@ class CodeArea extends Component {
           <Card id="outputText" variant="outlined">
             <CodeMirror
               value={this.state.outputContent}
-              height="100px"
+              height="120px"
               theme={themeList[this.props.theme]}
               placeholder="ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!"
               editable={false}
