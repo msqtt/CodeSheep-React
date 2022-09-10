@@ -56,9 +56,11 @@ class CodeArea extends Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.beforeunload);
+    document.documentElement.style.overflowY = "hidden";
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.beforeunload);
+    document.documentElement.style.overflowY = "scroll";
   }
   constructor(props) {
     super(props);
@@ -329,8 +331,7 @@ class CodeArea extends Component {
           <Card id="codeText" variant="outlined">
             <CodeMirror
               value={this.props.codeText}
-              minHeight="400px"
-              height="auto"
+              height="400px"
               theme={themeList[this.props.theme]}
               extensions={getExtensions(this.props.vim, this.props.lang)}
               placeholder="(๑・∀・ฅ✧ Code here"
@@ -343,7 +344,7 @@ class CodeArea extends Component {
           </Card>
 
           <ScrollTop
-            sx={{ position: "fixed", right: "2.0rem", bottom: "5rem" }}
+            sx={{ position: "fixed", right: "2.0rem", bottom: "15rem" }}
           >
             <Fab size="small" aria-label="scroll back to top" color="secondary">
               <KeyboardArrowUpIcon />
@@ -352,7 +353,7 @@ class CodeArea extends Component {
 
           <Fab
             onClick={this.handleFabClick}
-            sx={{ position: "fixed", bottom: "1rem", right: "1.5rem" }}
+            sx={{ position: "fixed", bottom: "8rem", right: "3rem" }}
             color="secondary"
           >
             {!this.state.waitCode ? "Go" : <CircularProgress color="inherit" />}
@@ -376,8 +377,7 @@ class CodeArea extends Component {
         <div id="inOut">
           <Card id="inputText" variant="outlined">
             <CodeMirror
-              minHeight="100px"
-              height="auto"
+              height="100px"
               theme={themeList[this.props.theme]}
               placeholder="(´-ωก`) Input..."
               basicSetup={{
@@ -398,8 +398,7 @@ class CodeArea extends Component {
           <Card id="outputText" variant="outlined">
             <CodeMirror
               value={this.state.outputContent}
-              minHeight="100px"
-              height="auto"
+              height="100px"
               theme={themeList[this.props.theme]}
               placeholder="ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!"
               editable={false}
