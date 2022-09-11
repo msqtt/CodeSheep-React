@@ -1,48 +1,55 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
 .container {
-    margin: 0, auto;
+  margin: 0, auto;
 }
 
 .headLine {
-    display: flex;   
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #inOut {
-    display: grid;
-    grid-template-columns: repeat(2, 50%);
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
 }
 
 #inputText {
-    margin: 8px 4px 4px 0;
+  margin: 8px 4px 4px 0;
 }
 
 #outputText {
-    margin: 8px 0 4px 4px;
+  margin: 8px 0 4px 4px;
+}
+
+.drag-handler {
+  background-color: grey;
+  height: 50px;
+  cursor: move;
 }
 
 footer {
-    margin-top: 4rem;
-    padding: 1rem;
-    border-top: 1px solid #eaecef;
-    text-align: center;
-    color: #4e6e8e;
+  margin-top: 4rem;
+  padding: 1rem;
+  border-top: 1px solid #eaecef;
+  text-align: center;
+  color: #4e6e8e;
 }
 
 .perfectA {
-    text-decoration: none;
-    color: #4e6e8e
+  text-decoration: none;
+  color: #4e6e8e;
 }

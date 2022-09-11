@@ -17,16 +17,17 @@ import {
   DialogContent,
   DialogContentText,
 } from "@mui/material";
+
 import { Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import OpenWithIcon from "@mui/icons-material/OpenWith";
 import TextField from "@mui/material/TextField";
 import CodeMirror from "@uiw/react-codemirror";
+import Draggable from "react-draggable";
 
 import { connect } from "react-redux";
 
 import Select from "./Select";
-import ScrollTop from "./ScrollTop";
 
 import ACTIONS from "../redux/aciton.js";
 import { POST, PUT } from "../utils/request";
@@ -46,6 +47,7 @@ class CodeArea extends Component {
     saveWindow: false,
     fileNameError: false,
     updateWindow: false,
+    showMoveFab: 0,
   };
 
   beforeunload(e) {
@@ -57,10 +59,12 @@ class CodeArea extends Component {
   componentDidMount() {
     window.addEventListener("beforeunload", this.beforeunload);
     document.documentElement.style.overflowY = "hidden";
+    document.documentElement.style.overflowX = "hidden";
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.beforeunload);
     document.documentElement.style.overflowY = "scroll";
+    document.documentElement.style.overflowX = "hidden";
   }
   constructor(props) {
     super(props);
@@ -226,7 +230,6 @@ class CodeArea extends Component {
         <div id="Code">
           <div className="headLine">
             <Typography
-              id="back-to-top-anchor"
               sx={{ marginBottom: 0 }}
               variant="h5"
               gutterBottom
@@ -331,7 +334,7 @@ class CodeArea extends Component {
           <Card id="codeText" variant="outlined">
             <CodeMirror
               value={this.props.codeText}
-              height="400px"
+              height="380px"
               theme={themeList[this.props.theme]}
               extensions={getExtensions(this.props.vim, this.props.lang)}
               placeholder="(๑・∀・ฅ✧ Code here"
@@ -342,22 +345,6 @@ class CodeArea extends Component {
               basicSetup={this.props.basicSetup}
             />
           </Card>
-
-          <ScrollTop
-            sx={{ position: "fixed", right: "2.0rem", bottom: "15rem" }}
-          >
-            <Fab size="small" aria-label="scroll back to top" color="secondary">
-              <KeyboardArrowUpIcon />
-            </Fab>
-          </ScrollTop>
-
-          <Fab
-            onClick={this.handleFabClick}
-            sx={{ position: "fixed", bottom: "8rem", right: "3rem" }}
-            color="secondary"
-          >
-            {!this.state.waitCode ? "Go" : <CircularProgress color="inherit" />}
-          </Fab>
 
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -373,47 +360,105 @@ class CodeArea extends Component {
               {this.state.resMsg}
             </Alert>
           </Snackbar>
-        </div>
-        <div id="inOut">
-          <Card id="inputText" variant="outlined">
-            <CodeMirror
-              height="120px"
-              theme={themeList[this.props.theme]}
-              placeholder="(´-ωก`) Input..."
-              basicSetup={{
-                highlightActiveLine: false,
-                highlightActiveLineGutter: false,
-                foldGutter: false,
-                bracketMatching: false,
-                autocompletion: false,
-                allowMultipleSelections: false,
-                closeBrackets: false,
-                lineNumbers: this.props.lineNum,
+          <div id="inOut">
+            <Card id="inputText" variant="outlined">
+              <CodeMirror
+                height="110px"
+                theme={themeList[this.props.theme]}
+                placeholder="(´-ωก`) Input..."
+                basicSetup={{
+                  highlightActiveLine: false,
+                  highlightActiveLineGutter: false,
+                  foldGutter: false,
+                  bracketMatching: false,
+                  autocompletion: false,
+                  allowMultipleSelections: false,
+                  closeBrackets: false,
+                  lineNumbers: this.props.lineNum,
+                }}
+                onChange={(e) => {
+                  this.state.inputContent = e;
+                }}
+              />
+            </Card>
+            <Card id="outputText" variant="outlined">
+              <CodeMirror
+                value={this.state.outputContent}
+                height="110px"
+                theme={themeList[this.props.theme]}
+                placeholder="ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!"
+                editable={false}
+                basicSetup={{
+                  highlightActiveLine: false,
+                  highlightActiveLineGutter: false,
+                  foldGutter: false,
+                  bracketMatching: false,
+                  autocompletion: false,
+                  allowMultipleSelections: false,
+                  closeBrackets: false,
+                  lineNumbers: this.props.lineNum,
+                }}
+              />
+            </Card>
+          </div>
+          <Draggable
+            handle=".drag-handler"
+            defaultPosition={{ x: 600, y: -120 }}
+            scale={1}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
-              onChange={(e) => {
-                this.state.inputContent = e;
-              }}
-            />
-          </Card>
-          <Card id="outputText" variant="outlined">
-            <CodeMirror
-              value={this.state.outputContent}
-              height="120px"
-              theme={themeList[this.props.theme]}
-              placeholder="ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!"
-              editable={false}
-              basicSetup={{
-                highlightActiveLine: false,
-                highlightActiveLineGutter: false,
-                foldGutter: false,
-                bracketMatching: false,
-                autocompletion: false,
-                allowMultipleSelections: false,
-                closeBrackets: false,
-                lineNumbers: this.props.lineNum,
-              }}
-            />
-          </Card>
+            >
+              <Fab
+                className="drag-handler"
+                disableFocusRipple
+                onMouseEnter={() => {
+                  this.setState({ showMoveFab: 1 });
+                }}
+                onMouseLeave={() => {
+                  if (this.state.showMoveFab) {
+                    this.setState({ showMoveFab: 0 });
+                  }
+                }}
+                size="small"
+                aria-label="move"
+                color="secondary"
+                sx={{
+                  opacity: this.state.showMoveFab,
+                  transition: "opacity 0.4s ease-in-out",
+                  zIndex: 1,
+                }}
+              >
+                <OpenWithIcon />
+              </Fab>
+              <Fab
+                onClick={this.handleFabClick}
+                size="large"
+                onMouseEnter={() => {
+                  this.setState({ showMoveFab: 1 });
+                }}
+                onMouseLeave={() => {
+                  if (this.state.showMoveFab) {
+                    this.setState({ showMoveFab: 0 });
+                  }
+                }}
+                sx={{
+                  zIndex: 2,
+                }}
+                color="secondary"
+              >
+                {!this.state.waitCode ? (
+                  "Go"
+                ) : (
+                  <CircularProgress color="inherit" />
+                )}
+              </Fab>
+            </div>
+          </Draggable>
         </div>
       </React.Fragment>
     );
