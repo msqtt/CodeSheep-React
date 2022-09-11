@@ -333,6 +333,7 @@ class CodeArea extends Component {
             <CodeMirror
               value={this.props.codeText}
               height="380px"
+              maxWidth="1280px"
               theme={themeList[this.props.theme]}
               extensions={getExtensions(this.props.vim, this.props.lang)}
               placeholder="(๑・∀・ฅ✧ Code here"
