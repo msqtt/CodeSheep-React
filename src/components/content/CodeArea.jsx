@@ -58,13 +58,9 @@ class CodeArea extends Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.beforeunload);
-    document.documentElement.style.overflowY = "hidden";
-    document.documentElement.style.overflowX = "hidden";
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.beforeunload);
-    document.documentElement.style.overflowY = "scroll";
-    document.documentElement.style.overflowX = "hidden";
   }
   constructor(props) {
     super(props);
