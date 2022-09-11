@@ -58,9 +58,11 @@ class CodeArea extends Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", this.beforeunload);
+    document.documentElement.style.overflowX = "hidden";
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.beforeunload);
+    document.documentElement.style.overflowX = "scroll";
   }
   constructor(props) {
     super(props);
@@ -405,7 +407,7 @@ class CodeArea extends Component {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "column-reverse",
                 alignItems: "center",
               }}
             >
