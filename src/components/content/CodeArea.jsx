@@ -401,16 +401,9 @@ class CodeArea extends Component {
           </div>
           <Draggable
             handle=".drag-handler"
-            defaultPosition={{ x: 600, y: -120 }}
-            scale={1}
+            defaultPosition={{ x: 1200, y: -120 }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column-reverse",
-                alignItems: "center",
-              }}
-            >
+            <div>
               <Fab
                 className="drag-handler"
                 disableFocusRipple
