@@ -35,12 +35,6 @@ code {
   margin: 8px 0 4px 4px;
 }
 
-.drag-handler {
-  background-color: grey;
-  height: 50px;
-  cursor: move;
-}
-
 footer {
   margin-top: 4rem;
   padding: 1rem;

@@ -23,7 +23,6 @@ import SaveIcon from "@mui/icons-material/Save";
 import OpenWithIcon from "@mui/icons-material/OpenWith";
 import TextField from "@mui/material/TextField";
 import CodeMirror from "@uiw/react-codemirror";
-import Draggable from "react-draggable";
 
 import { connect } from "react-redux";
 
@@ -32,6 +31,7 @@ import Select from "./Select";
 import ACTIONS from "../redux/aciton.js";
 import { POST, PUT } from "../utils/request";
 import { getExtensions, themeList } from "../utils/config";
+import Draggable from "react-draggable";
 
 class CodeArea extends Component {
   state = {
@@ -48,6 +48,8 @@ class CodeArea extends Component {
     fileNameError: false,
     updateWindow: false,
     showMoveFab: 0,
+    screenHeight: 0,
+    screenWidth: 0,
   };
 
   beforeunload(e) {
@@ -59,6 +61,10 @@ class CodeArea extends Component {
   componentDidMount() {
     window.addEventListener("beforeunload", this.beforeunload);
     document.documentElement.style.overflowX = "hidden";
+    this.setState({
+      screenHeight: window.screen.height,
+      screenWidth: window.screen.width,
+    });
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.beforeunload);
@@ -225,114 +231,117 @@ class CodeArea extends Component {
   render() {
     return (
       <React.Fragment>
-        <div id="Code">
-          <div className="headLine">
-            <Typography
-              sx={{ marginBottom: 0 }}
-              variant="h5"
-              gutterBottom
-              component="div"
+        <div className="headLine">
+          <Typography
+            sx={{ marginBottom: 0 }}
+            variant="h5"
+            gutterBottom
+            component="div"
+          >
+            Coding
+          </Typography>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button
+              onClick={this.handleSave}
+              variant="contained"
+              color="secondary"
+              disabled={!this.props.loginStatus}
+              style={{ height: "2.5rem", marginRight: "1rem" }}
+              endIcon={<SaveIcon />}
             >
-              Coding
-            </Typography>
-            <div style={{ display: "flex", alignItems: "center" }}>
+              Save
+            </Button>
+            <Select />
+          </div>
+        </div>
+
+        <Dialog open={this.state.updateWindow}>
+          <DialogTitle>Saving</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              你已经打开了一个代码喔，要如何保存呢?
+            </DialogContentText>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "2rem",
+              }}
+            >
               <Button
-                onClick={this.handleSave}
+                onClick={this.handleUpdateCode}
+                sx={{ width: "45%", height: "3rem" }}
                 variant="contained"
                 color="secondary"
-                disabled={!this.props.loginStatus}
-                style={{ height: "2.5rem", marginRight: "1rem" }}
-                endIcon={<SaveIcon />}
+              >
+                保存到原文件
+              </Button>
+              <Button
+                sx={{ width: "45%", height: "3rem" }}
+                onClick={() => {
+                  this.setState({ updateWindow: false, saveWindow: true });
+                }}
+                variant="contained"
+                color="primary"
+              >
+                另存一个新文件
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={this.state.saveWindow}>
+          <DialogTitle>Saving</DialogTitle>
+          <DialogContent>
+            <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
+              <TextField
+                autoComplete="off"
+                inputRef={this.filename}
+                error={this.state.fileNameError}
+                onChange={this.handleFileNameValid}
+                id="outlined-basic"
+                sx={{ marginTop: "6px" }}
+                label="FileName"
+                variant="outlined"
+              />
+            </Tooltip>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: "2rem",
+              }}
+            >
+              <Button
+                onClick={this.handleSaveConfirm}
+                sx={{ width: "45%", height: "3rem" }}
+                variant="contained"
+                color="secondary"
               >
                 Save
               </Button>
-              <Select />
+              <Button
+                sx={{ width: "45%", height: "3rem" }}
+                onClick={() => {
+                  this.setState({
+                    saveWindow: false,
+                    fileNameError: false,
+                  });
+                }}
+                variant="contained"
+                color="primary"
+              >
+                Cancel
+              </Button>
             </div>
-          </div>
+          </DialogContent>
+        </Dialog>
 
-          <Dialog open={this.state.updateWindow}>
-            <DialogTitle>Saving</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                你已经打开了一个代码喔，要如何保存呢?
-              </DialogContentText>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: "2rem",
-                }}
-              >
-                <Button
-                  onClick={this.handleUpdateCode}
-                  sx={{ width: "45%", height: "3rem" }}
-                  variant="contained"
-                  color="secondary"
-                >
-                  保存到原文件
-                </Button>
-                <Button
-                  sx={{ width: "45%", height: "3rem" }}
-                  onClick={() => {
-                    this.setState({ updateWindow: false, saveWindow: true });
-                  }}
-                  variant="contained"
-                  color="primary"
-                >
-                  另存一个新文件
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={this.state.saveWindow}>
-            <DialogTitle>Saving</DialogTitle>
-            <DialogContent>
-              <Tooltip title='文件名只能由数字，字母及 "_" 构成(125个字符以内)'>
-                <TextField
-                  autoComplete="off"
-                  inputRef={this.filename}
-                  error={this.state.fileNameError}
-                  onChange={this.handleFileNameValid}
-                  id="outlined-basic"
-                  sx={{ marginTop: "6px" }}
-                  label="FileName"
-                  variant="outlined"
-                />
-              </Tooltip>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: "2rem",
-                }}
-              >
-                <Button
-                  onClick={this.handleSaveConfirm}
-                  sx={{ width: "45%", height: "3rem" }}
-                  variant="contained"
-                  color="secondary"
-                >
-                  Save
-                </Button>
-                <Button
-                  sx={{ width: "45%", height: "3rem" }}
-                  onClick={() => {
-                    this.setState({ saveWindow: false, fileNameError: false });
-                  }}
-                  variant="contained"
-                  color="primary"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Card id="codeText" variant="outlined">
+        <div id="Code">
+          <Card id="codeText" variant="outlined" sx={{ position: "relative" }}>
             <CodeMirror
               value={this.props.codeText}
-              height="380px"
+              height={`${this.state.screenHeight * 0.6}px`}
               theme={themeList[this.props.theme]}
               extensions={getExtensions(this.props.vim, this.props.lang)}
               placeholder="(๑・∀・ฅ✧ Code here"
@@ -342,6 +351,59 @@ class CodeArea extends Component {
               onBlur={this.handleBlur}
               basicSetup={this.props.basicSetup}
             />
+            <Draggable
+              handle=".handle"
+              defaultPosition={{ x: 0, y: 0 }}
+              position={null}
+              bounds="#codeText"
+            >
+              <div style={{ position: "absolute", bottom: "2rem", right: "0" }}>
+                <Fab
+                  className="handle"
+                  disableFocusRipple
+                  onMouseEnter={() => {
+                    this.setState({ showMoveFab: 1 });
+                  }}
+                  onMouseLeave={() => {
+                    if (this.state.showMoveFab) {
+                      this.setState({ showMoveFab: 0 });
+                    }
+                  }}
+                  size="small"
+                  aria-label="move"
+                  color="secondary"
+                  sx={{
+                    opacity: this.state.showMoveFab,
+                    transition: "opacity 0.4s ease-in-out",
+                    zIndex: 1,
+                  }}
+                >
+                  <OpenWithIcon />
+                </Fab>
+                <Fab
+                  onClick={this.handleFabClick}
+                  size="large"
+                  onMouseEnter={() => {
+                    this.setState({ showMoveFab: 1 });
+                  }}
+                  onMouseLeave={() => {
+                    if (this.state.showMoveFab) {
+                      this.setState({ showMoveFab: 0 });
+                    }
+                  }}
+                  sx={{
+                    zIndex: 2,
+                  }}
+                  color="secondary"
+                >
+                  {!this.state.waitCode ? (
+                    "Go"
+                  ) : (
+                    <CircularProgress color="inherit" />
+                  )}
+                </Fab>
+              </div>
+            </Draggable>
           </Card>
 
           <Snackbar
@@ -361,7 +423,7 @@ class CodeArea extends Component {
           <div id="inOut">
             <Card id="inputText" variant="outlined">
               <CodeMirror
-                height="110px"
+                height={`${this.state.screenHeight * 0.15}px`}
                 theme={themeList[this.props.theme]}
                 placeholder="(´-ωก`) Input..."
                 basicSetup={{
@@ -382,7 +444,7 @@ class CodeArea extends Component {
             <Card id="outputText" variant="outlined">
               <CodeMirror
                 value={this.state.outputContent}
-                height="110px"
+                height="20%"
                 theme={themeList[this.props.theme]}
                 placeholder="ฅ ̳͒•ˑ̫• ̳͒ฅ♡ Output!"
                 editable={false}
@@ -399,57 +461,6 @@ class CodeArea extends Component {
               />
             </Card>
           </div>
-          <Draggable
-            handle=".drag-handler"
-            defaultPosition={{ x: 1200, y: -120 }}
-          >
-            <div>
-              <Fab
-                className="drag-handler"
-                disableFocusRipple
-                onMouseEnter={() => {
-                  this.setState({ showMoveFab: 1 });
-                }}
-                onMouseLeave={() => {
-                  if (this.state.showMoveFab) {
-                    this.setState({ showMoveFab: 0 });
-                  }
-                }}
-                size="small"
-                aria-label="move"
-                color="secondary"
-                sx={{
-                  opacity: this.state.showMoveFab,
-                  transition: "opacity 0.4s ease-in-out",
-                  zIndex: 1,
-                }}
-              >
-                <OpenWithIcon />
-              </Fab>
-              <Fab
-                onClick={this.handleFabClick}
-                size="large"
-                onMouseEnter={() => {
-                  this.setState({ showMoveFab: 1 });
-                }}
-                onMouseLeave={() => {
-                  if (this.state.showMoveFab) {
-                    this.setState({ showMoveFab: 0 });
-                  }
-                }}
-                sx={{
-                  zIndex: 2,
-                }}
-                color="secondary"
-              >
-                {!this.state.waitCode ? (
-                  "Go"
-                ) : (
-                  <CircularProgress color="inherit" />
-                )}
-              </Fab>
-            </div>
-          </Draggable>
         </div>
       </React.Fragment>
     );
