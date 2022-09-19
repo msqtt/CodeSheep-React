@@ -87,9 +87,7 @@ class Login extends Component {
         if (data.config !== undefined)
           localStorage.setItem("user-config", data.config);
 
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
+        window.location.href = "/";
       }
     } else {
       this.handleSnackMsg(400, "出现了很奇怪的错误，没返回数据嗷 （´(ｪ)｀）");
