@@ -7,6 +7,7 @@ function Footer() {
       {" "}
       <a
         href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=45032302000093"
+        target="_blank"
         style={{
           display: "inline-block",
           textDecoration: "none",
