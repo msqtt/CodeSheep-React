@@ -9,7 +9,7 @@ const logo = `
 
 export function printLOGO() {
   console.log(
-    `%c${logo} %cV2.0 Power by fun`,
+    `%c${logo} %cV2.1 Power by fun`,
     "color: #2da44e",
     "color: #2da44e;font-size: 0.75rem;font-style: italic;"
   );
