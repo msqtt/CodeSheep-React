@@ -103,7 +103,7 @@ class CodeArea extends Component {
 
       if (this.props.codeText !== "") {
         let data = await POST(
-          "/api/code-run",
+          "/back/code-run",
           {
             language: this.props.lang,
             code: this.props.codeText,
